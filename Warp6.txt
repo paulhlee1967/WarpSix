@@ -1,0 +1,266 @@
+
+Warp Six BBS, created by Jim Ferr
+Frank Kucharski, and Scott Johnson
+Public domain version 3.0
+November 1994
+
+File Specifications
+
+Bytes per field (including carriage return) are in parentheses ()
+
+USERS, type TXT   Record Length=175
+
+(Each variable in this file has two names, one for the "main" user, ie. the one currently online, and one for the "aux" user, which is used for editing users in Sysop.Util. For instance, the ID number is stored in the variable ID or UI.)
+
+ID/UI     User ID number. Always R+1000. (5)
+PW$/UP$   Password (8)
+N1$/N3$   First Name (16)
+N2$/N4$   Last Name (21)
+UA$/AU$   Alias (18)
+A1$/A3$   City (20)
+A2$/A4$   Province/State/Country (3)
+PH$/TE$   Phone number, nnn-nnn-nnnn (13)
+FD$/DF$   Date First on (10)
+LD$/DL$   Date Last on (10)
+LT$/TL$   Time last on (5)
+XU/X1     number of uploads (5)
+XD/X2     number of downloads (5)
+TD/DT     calls today (2)
+UH/HU     user hot key setting 0=off/255=on (4)
+SL/US     Security Level (0-9) defined: (2)
+ 0 = unvalidated/guest
+ 1 = devalidated
+ 2 = validated user
+ 3-7 = whatever use you desire
+ 8 = co-sysops only
+ 9 = sysop only
+MT/UT     Machine Type. defined: (2)
+ 0 = undefined
+ 1 = Apple // or compatible
+ 2 = Macintosh, Mac XL or Mac Plus
+ 3 = IBM or compatible
+ 4 = Other
+BP/UP     Bulletins posted  (5)
+ME/MB     Membership flag, 0=off, 1=on (2)
+TM/UM     Total Mail waiting (3)
+TC/TK     Total Calls made (5)
+
+Per Record Total: 21 fields, 174 bytes, 0 spare, 1 for EOR marker.
+
+REC.DATA, type TXT
+
+LR     Last Record used in USERS file (0-200)
+15030  Dummy field, indicating system has been updated to PD version 3.0
+            
+
+MODEM.INIT     Holds initialization strings for the modem. The first line is sent to the modem "blindly", and the driver waits one second and clears its buffer before sending subsequent lines, if any. Subsequent lines must be responded to by a '0' (OK) digital result code from the modem or the driver will return a DEVICE NOT CONNECTED error to the BBS, which will result in a beep and the message, "Modem not responding!" on the sysop screen. Each line must terminate with a single carriage return. Extra carriage returns will cause the aforementioned error.
+
+(FORUM DIRECTORIES)
+
+INTRO, type TXT
+This file is TYPED upon entry into a forum
+
+DATA.F, type TXT (set up by the Add.a.Forum module in Sysop.Utils)
+FM$   Forum name
+ES    Entry security (min.) 0-9
+WS    Write security (min.) 0-9
+MO    Members only flag (0-1)
+BL    Bulletin limit - max. number of messages in this forum (4-9999)
+FD    Auto-delete 1st message if FD=1, forum is full if BL reached and FD=0
+FB    refnum of 1st msg. posted in this forum
+LB    refnum of last msg. posted in this forum
+TT    total number of messages in this forum
+FA    Is alias allowed in this forum (0=real name only  1=alias)
+
+
+DATA.U, type TXT   L=6     
+
+RL    last bulletin read by each user, indexed by record number where R=ID-1000
+
+Filenames for messages are in the following format:
+
+"M"+"."+STR$(CB)
+
+Eg. M.15844, where 15844 is the reference number of this message. CB stands for "current bulletin".
+
+BULLETINS
+The first few fields compose the bulletin header. The FROM field is INPUT into memory for the Post reply and reply by E-mail feature. Below is the header format:
+
+(Blank Line)
+From | JIM FERR
+To   | All
+Subj | Bulletin header format
+Date | 01-JUN-94 21:14
+Code | xx
+(Blank Line)
+Message text.
+
+
+GEN Directory
+
+F.DATA    Holds name of file section and number of sub-sections
+TITLES    Menu of sub-sections
+Fn        Subdirectories F1 to Fwhatever hold actual general files
+
+GEN/Fn Directories
+
+F.DATA    Holds name of section and number of files
+TITLES    Holds menu of files
+Fn        Files F1 to Fwhatever are the files themselves.
+
+EMAIL Directory
+Similar to bulletins, but filenames are M.1000.1 where 1000 is the ID number and 1 is the letter number. Below is the E-mail header format:
+
+(Blank Line)
+From | JIM FERR
+Subj | Private letter
+Date | 02-JUN-94 21:14
+Code | xx
+(Blank Line)
+Message text.
+
+(Reports to sysop are identical except the name is followed by a comma and the user's ID number and the words "Private letter" are replaced with "Report to sysop".
+
+
+Modifying System "Time-out" Defaults
+
+Timeout values can be modified with POKE statements which you can add to the LOGON program. There is no need to modify the timeout values if you add a hardware accelerator, as Warp Six BBS uses vertical blanking for timing and this is unaffected by acceleration. Below are some lines you could add to the LOGON program to change the timeout values. The values shown here are the DEFAULT values -- they are already set in the driver so there is no need to add these lines to LOGON unless you want to change these defaults:
+
+91 POKE BA+62,4 : REM Set timeout to 4 minutes
+92 POKE BA+63,180 : REM Set wait after Control-S to 180 seconds
+93 POKE BA+64,60 : REM Set time between modem OK checks to 60 seconds
+
+As of Warp Six BBS version 8.8, timeouts use the vertical blanking signal to maintain accuracy. This means that adding an accelerator does NOT require you to change timeout values. (Hooray!)
+
+
+Programming Modifications
+
+If you are a glutton for punishment, you can make modifications to the system. Just keep in mind the following caveats. Have a backup copy of the original unmodified program in a safe place, and make incremental backups during your modifications so that if any unexplained bug should occur, you can simply go back to an older version. Test all changes thoroughly for unexpected bugs before subjecting them to your users.
+
+To make a major addition you should write additional programs which can either be run or CHAINed from the main program. A good example of this technique is the SYSOP.UTIL program. There is more information on common modifications in the Sysop.Doc file. And now for some details...
+
+
+Getting Input
+
+Before getting input, do the following:
+
+POKE VI,x, where x is the maximum length of characters you want to accept. A value of zero will only accept a carriage return. The video width is preset to 80 columns - 2, and is stored in VW.
+
+POKE UC,0 to enable full upper and lower case.
+
+POKE UC,1 to convert characters in range A-Z to lower case.
+
+POKE UC,255 to convert characters in range a-z to upper case.
+
+POKE MD,255 to echo asterisks when taking input. (This is the hidden mode, and is generally used to take password input. Hidden mode is automatically shut off when the user presses RETURN.
+
+POKE MD,1 to NOT echo when taking input.
+
+POKE HK,UH to enable hot keys if the user has the hot keys option turned on. Hot keys are automatically disabled after each character returned (the character is always terminated with a system-generated carriage return) so if you want hot keys, you ALWAYS have to POKE HK,UH before doing your GOSUB to get input.
+
+A neat feature prevents the character the user typed as a hot key command from being displayed. You can then print an entire word at the touch of a key, as is done in the forum module. Use POKE HE,0 to disable hot key echo. You have to explicitly enter POKE HE,255 to enable hot key echo again. With echo off, you have to do a little more programming in BASIC to make the system "look" normal. (This feature can be a little slow and may disappear in the future, so let me know if you make use of it.)
+
+CALL M7 to clear the modem input buffer if you wish. Most times this is not desirable. The only time it might be useful is if the system has just performed a lengthy operation and the user may have hit a key accidentally or line noise may have resulted in character being generated.
+
+PRINT a prompt, for example PRINT : PRINT "Enter your name : "; (Note the semicolon. It is necessary to suppress the carriage return in your prompt.)
+
+Note that the options above (except for the hot keys and mode flags) will remain as you last set them, so it is not always necessary to do each POKE.
+
+After setting the above options, do a GOSUB 100 to get a line of input with time limit active. If the user is out of time, he or she will be logged off. If the user has five minutes or less time remaining and hasn't already been warned the system will print a message indicating the time remaining. To get a line of input with time limit ignored, do GOSUB 130. Note: time limits are only checked when the user hits Return. The system can still "time out" (and automatically disconnect) if the user doesn't enter any characters for a long period.
+
+When control returns from GOSUB 100 or 130, the user's input will be in I$. If CR=1 then the user pressed RETURN. If you wish, do a GOSUB 170 to check for commas, colons or dashes. Then if EE=1 the user did enter one of these, so do a GOSUB 190 to reject the input, and then GOTO the line requesting the input again. (Assuming you don't want commas, colons and dashes -- if you are writing the input to a random access file, for example.)
+
+It is possible control will not return after a GOSUB 100 or 130 to get input, if the caller drops carrier (ie. hangs up) or a control-K (kill command) is issued from the console or if the caller times out and the system disconnects. The input routine will automatically branch to the logoff code if this happens. The system is designed to fully recover after any premature disconnection, and will fully save the user's stats before getting another call.
+
+
+Output
+
+As already mentioned, you can simply use PRINT statements to send output. In addition, there is the built-in TYPE command, which will read standard ASCII text files to the current output, filtering all unwanted control characters. All text output to the modem (either from the TYPE command or PRINT statements) is normal ASCII with the high bit clear.
+
+Eg. PRINT D$"TYPE MY.FILE" will dump the contents of MY.FILE, regardless of its contents. D$ is set to CHR$(4) at the beginning of LOGON. The D$ is required whenever issuing a ProDOS command.
+
+IMPORTANT NOTE: DO NOT USE ANY PR# COMMANDS AS YOU WILL DISCONNECT THE OUTPUT ROUTINE THE SYSTEM USES TO SEND DATA TO THE MODEM. (SEE EXCEPTION BELOW.)
+
+You should never ever use IN# and input to get user input. Use GOSUB 100 or 130 exclusively. Getting input via in# and 'input' would leave your system wide open to hackers in the unlikely event of a crash. The machine language input routines must be called to get input. This provides the ultimate in security for your system: in the event the system crashes, the remote user can't input anything. (With Warp Six, the INPUT statement is only used for reading text files.)
+
+There is only one output option: the private flag. If you do a POKE PF,255 before sending output, the output will only go to the modem (if active). Doing a POKE PF,0 reverses this condition. The system uses the private flag to ensure E-mail is not displayed on the console screen. Thus you as sysop cannot read user mail unless you read it directly from disk, which is considered to be in poor taste (not to mention against the law in some areas) unless you display a prominent message telling users you will be monitoring E-mail. Note that mail directed to the sysop WILL be displayed. (There is a BASIC routine in W6.MESSAGE that handles this.)
+
+
+Printing a message to your printer
+
+You can add a routine similar to the one below to print a text file to your printer. Add this routine to Warp6.BBS and when anyone with level 9 types an X at the forum prompt, the current message will be printed. (The routine prints the file held in the variable F$.) You can add this to any program, at any line number you wish. Ensure you don't leave out the PR# command (shown below in line 840).
+
+810  PRINT D$"PR#1" : REM Print to printer interface or port in slot 1
+820  PRINT  CHR$ (9) + "80N": REM Interface card setting
+830  PRINT D$"TYPE ";F$
+840  PRINT D$"PR#A$8D00": REM Return control to the Warp Six driver
+850  RETURN
+
+
+Displaying the time remaining:
+
+To show the user the time left in a system prompt, add the following to the line that displays the prompt:
+
+ABS(PEEK(EM)-TL);" mins. left : ";
+
+This will display the time remaining. Note: user time limits are not enforced during message posting, or E-Mail entry. After saving the message, the next time the user hits Return he or she will be logged off if the time limit has been exceeded.
+
+To halt program execution hit Control-Reset. Control-C will merely cause an error #255, which will be trapped and logged by the system. You can stop the system if you hit Control-C several times when BASIC is printing text. (Some programs will stop execution with the message "Sysop Break", but not if you are calling remote, for obvious reasons.) Because the system uses interrupts for modem input, an interrupt handler is allocated. Use the Quit command (Control-Q) to properly deallocate the interrupt handler and disable serial interrupts.
+
+Check your error log frequently. (Hit # at the main menu.) You shouldn't experience many errors in normal operation.
+
+
+Appendix A: Local commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Active while awaiting a call:
+
+Open Apple-L :local logon/logoff toggle. Typing Open Apple-L while the system is waiting for a call lets you logon from the keyboard. Hitting Ctrl-L while you are logged in at the keyboard is like dropping carrier, ie. hanging up. The logoff command works just as well; I use Open Apple-L when I'm in a hurry (for instance, I see the AA LED on my modem flashing, indicating someone is calling the system.
+
+Open Apple-Q :quit program (disables interrupts, and removes handler)
+
+Active while user online:
+
+Open Apple-A :(keyboard toggle) has been removed.
+
+Open Apple-C :sysop online/offline toggle for chat
+
+Open Apple-K :kill call (hangup on remote caller without warning)
+
+Closed Apple-RETURN :Gives user "Sysop doing system maintenance..." message and pauses their connection. The local system goes to
+                     SYSOP.UTILS. Upon quitting SYSOP.UTILS, control is returned to user.
+
+
+Appendix B: Inside the "Driver" Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Warp Six "Drivers" are binary programs responsible for handling communication between the BBS and the modem, keeping track of user time limits and various other tasks. (Only one driver can be active at any one time.) The system uses the driver through AppleSoft's "CALL" command. For example, the statement CALL M6 hangs up the modem. If you wish, you can write an entirely new BBS in AppleSoft BASIC using the Warp Six drivers. (Enjoy yourself!)
+
+The driver is loaded into memory in an area protected from AppleSoft; the AppleSoft variables M0 to M7 define the location of routines in the driver. (These are defined at the beginning of the LOGON program.) If you will be making customizations to the system, some knowledge of the driver routines will be helpful. Below is a listing of the driver routines that can be called from AppleSoft:
+
+Name   Description
+
+M1      Sets up the driver for use. Call this routine before any others.
+M2      Waits for call or local (keyboard) command. (See "Local Commands".)
+M3      Main input routine. Returns input to first variable in memory.
+M4      Saves the time that the current call began. (Used for time limits.)
+M5      Updates ProDOS date and time internally. (Calls MLI Get_Time.)
+M6      Displays copyright message and hangs up modem.
+M7      Clears any characters from the modem input buffer.
+M8      Disable all interrupts and remove interrupt handler *
+M0      Sends the MODEM.INIT file to modem, to set it up for Warp Six.
+
+* The M8 routine is for the convenience of those who would like to exit from Warp Six BBS without quitting to ProDOS. To completely remove Warp Six from memory, you should CALL M8 and then CALL 48888, BASIC.System's FREBUFR command. Once this is done, the modem driver and interrupt handler is completely removed from memory, and you can run any program you wish. Note: after the driver has been removed, you should not attempt to make any driver CALLs, naturally. Of course, you can still use the standard method of quitting Warp Six: hit Open Apple-Q at the wait for call screen.
+
+TYPE    Must be called from Basic.System like any other ProDOS command. Eg. PRINT D$"TYPE PATHNAME". The text file will be displayed to the screen and modem depending on whether a user is online, and how the private flag is set. Xon/Xoff is accepted during TYPE -- user's can pause with Control-S and resume with Control-Q or Return or Spacebar. Also, TYPE doesn't care what file type it displays; it will merrily display binary and directory files if you tell it to, but it filters the data so only printable ASCII comes out.
+
+SEND
+
+Sends a file via Xmodem or Ymodem with the parameters set by POKEs (see Xfer.Util)
+
+RECEIVE
+
+Similar to SEND but initiates Xmodem receive.
+
+
+COPY
+
+Implementation of a ProDOS copy command. Can copy ProDOS 8 files (except directories). Enter the copy utility from Sys.Utils.

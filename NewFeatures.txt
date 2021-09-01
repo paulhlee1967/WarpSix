@@ -1,0 +1,113 @@
+ New features and bug fixes for Warp Six version 3.0
+ =============================================
+ - Moved the assignment of variables XA and FF to LOGON from XFER.UTIL to
+    make updates a bit more painless in the future.
+ - Added some memory management to the entire BBS. It now saves a base set
+    of variables needed to operate while a user is online and if a portion
+    of the BBS creates a bunch of new variables (many games...) or fills
+    up arays (mail and forums) the BBS can now clear those from memory
+    before moving on.
+ - Users can now logon by name as well as ID#.
+ - There is now an optional guest account with a 20 minute time limit. The
+    sysop can select an unused account to be set up with security zero and
+    set the system for read only in selected forums so new users can peek
+    around before applying for an account. This cuts down on validating
+    those "one time users" looking for files or whatever...
+ - Added some intelligence to the logon procedure. It will now prompt
+    users in some cases, such as if they select the wrong ID# by mistake.
+    After trying their password 2 times, it will ask if they are "user x"
+    and if not they can re-enter their ID#. If their account was
+    purged for inactivity, it will notify them of the possibility and ask
+    if they wish to apply for a new account. If yes they will be sent
+    directly to ADD.USER.
+ - Added ANSI auto-detect at logon. You must still supply ANSI screens and
+    necessary basic lines for any screens you want to add yourself just
+    like with PSE. ANSI uses the PS flag. 0=no emulation, 128=ANSI,
+    255=PSE.
+ - Added a slightly longer pause before answering a call and before the
+    BBS receives control back from the modem driver. This is to fix some
+    problems "some" modems have when attempting to auto-detect PSE and
+    ANSI. It also gives any Caller ID device you have on the BBS line time
+    to receive the CID info between the first and second ring.
+ - Added a co-sysop security level (SL-8). SL-8 can now see locked files,
+    has access to sysop utilities, and each user with SL-8 has an
+    individual remote password separate from the sysop's.
+ - "Report to sysop" now supports a mutiple name list to include your
+    co-sysops. You can include users with security level lower than 8 also.
+ - Added "sysop doing user maintenance" feature. When a user is online and
+    at the MAIN menu prompt, pressing OPTION (or Closed Apple) while 
+    pressing return at the local keyboard will send the sysop to the sysop 
+    utilities. While there, the sysop has access to any functions in the 
+    menu plus a couple. Pressing "+" or "-" with this feature will increment 
+    or decrement the online user's security level by one (each time it is
+    pressed). The user is given a polite message and asked to wait. they
+    do NOT see the sysop working. The user is notified when the sysop
+    returns (quits from Sysop utilities). Real nice for instant validation
+    when you have a caller ID box on the BBS line.
+ - Added a "Locate user" function to sysop utilities. You can search on a
+    user's alias, real name (last or last and first), or partial last name
+    (contains "xxx"). Returns name, alias, and ID# for any matches.
+ - The sysop can copy a user to a new ID#. If you need this, use it with
+    caution for obvious reasons...
+ - Purge will now ignore users with security level above a selected number
+    (default=2). The sysop selects the level they wish EACH time purge is
+    used. This allows users to have permanent accounts if you wish. Much
+    less manual purging necessary.
+ - Added a file copy command to SYSOP.UTIL. It was in version 2.5 but you
+    had to chain to it using the ProDOS command. Now just select from the
+    menu. It supports BATCH copy, move, delete, lock, and unlock. Files
+    are selected by number. 20 file maximum to each batch.
+ - Moved the menu comand for SORT user list to sysop utilities where it
+    really belonged anyway. Rewrote the sort routine for more speed. It
+    now uses a SHELL sort instead of the old reliable (but S-L-O-W) BUBBLE
+    sort. User lists will be sorted alphabetically  by name or alias based
+    on the alias flag for your BBS. Real names are formatted to 2 columns.
+    Aliases are formatted to 4 columns.
+ - Added a forum queue feature. Users can select which forums they wish to
+    read when using Quickscan or Continuous Quickscan. Users can still
+    manually enter any forum they wish regardless of their queue
+    selections. This feature works with 20 forums. If you have more forums
+    than this the BBS won't crash but the user's queues will be ignored.
+    You will be prompted when you atempt to add forum number 21.
+ - There is now an alias flag for EACH individual forum. If you have an 
+    alias system, you can have a real name forum for serious discussion.
+ - User selectable screen clear (or not) between each message in the
+    forums.
+ - Fixed a bug in the forums. If a user tried to MAIL a reply from the
+    same message twice, the BBS would log them off with an error #5.
+ - Users can now send mail to another user's ID#. Much faster than sending
+    to a username. The ID# doesn't need to be searched for...
+ - Users can now send multiple carbon copies in Email. Send carbons to
+    user names, aliases, or ID#s.
+ - Added a door game prefix to SYS.DATA and a door launcher program is included.
+ - Changed VALIDATION date to FIRST date on the system. This field is no
+    longer updated when a user is validated. This allows a "flag" of sorts
+    to see if a user account has been purged and taken over by a new user.
+    This was needed to reset some of the new features in version 3.0 for a
+    new user. Also good for game scores.
+ - Added some info to the caller status block at the top of the sysop's
+    screen when a user is online.
+ - Modified the "waiting for call" screen. Now shows sysop mail waiting
+    and how much new. I got tired of logging on just to check my mail...
+    <Grin>
+
+    I was working on a feature to attach files to mail but ran into some
+problems. It will not be included in version 3.0 but MAY be in a future
+release.
+    Frank Kucharski was working on the file transfer stuff and had a
+very hectic schedule when work on 3.0 was being done. His changes weren't 
+going to be done in time for version 3.0 but we planned to release a new 
+version when he was done. The project was abandoned and Frank has sadly 
+passed away since then.
+    Jim Ferr is working on the drivers and all Asembly portions of Warp
+Six. He has made quite a few changes but not a lot of it is not real evident
+to the users... The biggest thing you will see is the file list in the
+transfer section. It is now displayed in 2 columns.
+    Hopefully we will have this released by Christmas. (didn't happen...)
+I need to finish debugging, write an updater program, update the help 
+files, and rewrite the documentation. Basically all the fun stuff...  :(
+
+Scott Johnson - Warp Six developement team member
+
+**4/20/2017 - I'm finishing this project now upon learning that a Warp Six 
+           sysop has figured out a way to put Warp Six on the internet!
