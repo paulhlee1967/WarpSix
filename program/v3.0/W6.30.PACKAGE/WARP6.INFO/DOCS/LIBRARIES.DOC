@@ -1,0 +1,126 @@
+Warp Six BBS, created by Jim Ferr,
+Frank Kucharski, and Scott Johnson
+Public domain version 3.0
+June 1994.
+
+With transfer data libraries, your bulletin board system becomes a repository of valuable information, public domain and shareware programs. As system operator, you decide how many data libraries will be on your system, and what their names will be. You also control access to the data libraries, including the security level and minimum baud rate required to enter each libary and to upload in each libary. Your first step in setting up your transfer section is to create the Lib.Data file.
+
+
+The Lib.Data File
+
+The system's LIB.DATA file tells the system how many libraries you have, what they are called, and where they are located (in terms of ProDOS prefixes). LIB.DATA is located in the system's root directory: /HD1/WARP6/BBS.
+
+LIB.DATA is a standard ProDOS text file consisting of several lines of text. The first line contains a number that tells the system the total number of data libraries you have. Then there is one line holding the name of each area. Finally the ProDOS prefix to set for each area is listed, each on a separate line, in upper case with no trailing slash. Here is an example of a properly written LIB.DATA file:
+
+4
+Apple II Data Library
+Macintosh Library
+Science Fiction Contributions
+Apple II Technical Notes
+/W62/LIB/APPLE2
+/W62/LIB/MAC
+/W62/STORIES
+/DEV.CD.6/ESSENTIALS/TECHNICAL.DOCS/TECH.NOTES
+
+As you can see, the file has a structure. The BBS reads the file's contents line by line. The first line contains the total number of libraries. In our example, the system sees a "4" in the first line, so it knows to read 4 library names followed by the 4 ProDOS prefixes to set for each library, respectively. The system doesn't create these directories -- they must already exist and be on a ProDOS volume that is available when the BBS is running. You can create the library directories yourself, or just enter pathnames of existing directories containing files you want to become
+data libraries. In ProDOS terminology, each library is a "sub-directory", but I tend to call them "directories".
+
+Caution: ensure you do not include any commas or colons in the names of the libraries. You should probably enter the ProDOS prefixes in UPPER CASE, although it isn't strictly necessary with later versions of BASIC.System.
+
+Let's say you've set up the LIB.DATA file like the example above. When a user enters the transfer section, they are asked what transfer section to open (1 through 4) and can send a question mark to see the list of library names -- names which you previously entered in the LIB.DATA file.
+
+The optional Prefs.D file
+
+Within each library, the default "access privileges" will apply unless you create a Prefs.D file and save it in the library you want to have access privileges that are different in any way from the system defaults for the following things:
+
+- the minimum security level the user must have to enter the library (default=0)
+- what security level a user needs to upload files to the library (default=2)
+- whether or not the library is restricted to members only (default=0)
+- what is the minimum required baud rate for downloading (default=1)
+
+If a PREFS.D file for the library is not found, the system defaults will apply: the system will allow all users entry to the library, including new unvalidated users, and "non-members", but will require level 3 access for uploading. As well, callers at all baud rates (300, 1200 and 2400) can download files.
+
+If these defaults are to your liking, there is no need to create a PREFS.D file (There is a sample PREFS.D file in the "WARP6.INFO/EXTRAS" folder). You may have PREFS.D files in some libraries, but not in others. You can even define libraries on read-only volumes like CD-ROMs. Naturally, as a CD-ROM is read-only, you can't create PREFS.D files for CD-ROM data libraries, so the system defaults will apply. So, what if you don't like the defaults? You can change the defaults: they are defined in line 1040 of the Xfer.Util program, located in the Warp6/Xfer directory. The variables defined are the same as in the table after the next paragraph.
+
+(CD ROM Note: There is a problem with old versions of ProDOS 8 and CD ROM volumes you need to be aware of. Symptom: user tries to upload a file to a library on CD, and gets a message stating uploads cannot be accepted to a "locked volume". When the user does any operation that requires writing data to disk (eg. logoff, send E-Mail, post a message) the system gets another write protect error, and crashes. Solution: daisy chain the CD ROM from a hard disk that contains at least two ProDOS partitions. If the hard disk has only one partition, the bug may cause this problem with Apple SCSI Cards. I am not sure if third party cards are affected. ProDOS 8 version 2.0.1 and later fixes this problem, but the offending code still exists in Apple SCSI card ROMs, so the problem will STILL OCCUR with Apple SCSI cards UNLESS you have daisy chained from a hard disk with more than one partition.)
+
+PREFS.D File specifications:
+
+ES  Line 1: Entry security level (default is 0 **)
+WS  Line 2: Write (upload) security level (default is now 2)
+MO  Line 3: Members only flag (0=everyone, 1=members only)
+RB  Line 4: ** New ** Required baud rate to download via Xmodem in this library, where 1=300 baud (default), 2=1200 baud, and 3=2400 baud. Caution: if you set this value higher than 3, NOBODY will be able to download files.
+
+Each line must terminate with a carriage return. You can place comments at the bottom of the file after your prefixes are defined; Warp Six only reads the lines it needs. Here is an example file:
+
+0
+2
+0
+1
+
+Comment: level 0 can enter, level 2 can upload, non-members okay, 300 baud ok. Baud rates: 1 = 300, 2 = 1200, 3 = 2400.
+
+The first zero is line 1 of the file. The "comment" is also part of the file and is ignored by the system. Commenting the files will help you remember which lines mean what.
+
+Users can list available files, get file descriptions and download, view or even upload, if they have the required security level. When listing files, the system does not display the following kinds of files:
+
+- Files of type FND and DIR
+- Files that are locked (shown only to level 8 and 9 users, with * prefix)
+- Files with names ending in ".D" (used for file descriptions)
+- Files with names ending in ".H" (used to record # of times downloaded)
+
+When anyone uploads a file, it is automatically locked by the system. This is a security measure to permit you (or any co-sysops you have) to ensure the uploaded file does not break any copyright laws and is the kind of thing you want on your system, and in this particular data library.
+
+It is interesting to note that although the file is NOT visible to normal users using the L)ist files command, if any user knows the filename he or she CAN download the file. This can come in handy if you, the sysop, have a file for just one particular user. You can lock it and send e-mail giving the filename and which library to download it from.
+
+To make a file visible to users without level 8 or 9 access, enter P for ProDOS command and UNLOCK FILENAME. To make a file invisible, enter P for ProDOS command and LOCK FILENAME. You can see a catalog of all files by entering P for ProDOS command and then doing a CATALOG or CAT.
+
+When L)isting files, those with level 8 or 9 access will see the locked files as well as the unlocked ones. Each locked file will have a * character to the left of its filename.
+
+The .D files are description files and the .H files are "history" files used to keep track of how many times a file is accessed, ie. successfully downloaded or fully viewed. For example if a user uploads a file called TREK, the system will ask the user for a description of the file and save it as TREK.D and will create a new history file and call it TREK.H. Here is the format of the .D "description" files:
+
+line 1:  Uploaded on 03-JUN-94 by JIM FERR.
+line 2:  (blank)
+lines 3 to end: description of the file.
+
+Note regarding .D and .H files: when a user uploads with Binary II active, the system strips off the Binary II header on the file and saves the file to the name in the Binary II header. Hence, TEST.BXY becomes TEST.SHK. If the user specified TEST.BXY as the filename, the description file will be named TEST.BXY.D and the history file will be named TEST.BXY.H. You as system operator will have to rename such problem files or else users will not see the description, and you'll have an "orphaned" history file wasting disk space and preventing others from uploading a file of the same name.
+
+Macintosh files uploaded with MacBinary II headers will be listed as type MAC, which is really type $F2, meaning "user filetype number 2". The system tags all files received with MacBinary II headers as type $F2 and displays them with the L)ist files command as type MAC. Since the MacBinary header is saved as part of the file, when a Mac user downloads it the attributes are sent, just like in Binary II.
+
+
+Adding files to your libraries:
+
+You can make a library out of any ProDOS subdirectory, whether it already contains files, exists on a read-only volume like a compact disc or resides on normal read/write media. With locked volumes of any kind, history files are not created and the default library preferences apply. Also, uploads are refused with a polite message.
+
+You will probably want to compress files with ShrinkIt or ShrinkIt GS before placing them in your libraries, assuming they are Apple II files. When using ShrinkIt, it is best to add the Binary II header to the file to prevent inexperienced users from downloading it without any attributes intact.
+
+
+Removing files from your libraries:
+
+You can use the convenient R)emove command to delete any file. It will take care of deleting the file's description and history files (FILENAME.D & FILENAME.H) as well.
+
+Note: You may find it useful to alphabetize your library directories now and then or sort them by date or some other criteria, as they will get cluttered with .D and .H files. Naturally, end users won't see these files as they must use the L)ist files command, and you won't see them unless you enter the ProDOS CAT or CATALOG command, or view the directory from outside Warp Six.
+
+
+Enforcing time limits for downloading
+
+The system comes pre-configured to ignore time limits when downloading except:
+
+- Downloads that will take more than 3 hours are refused (line 6160)
+- During prime time, downloads that will exceed time limit refused (6170 & 6200)
+
+Below are the lines you can modify if these settings are not to your liking:
+
+6160  IF SL < 8 AND  INT (T / 60) > 180 THEN  PRINT : PRINT "More than 3 hours? No thank-you.": GOTO 1300
+6170  CALL M5: IF  PEEK (49043) < 17 OR  PEEK (49043) > 19 THEN 6210
+6180  IF SL < 8 AND  INT (T / 60) > ( ABS ( PEEK (EM) - TL)) THEN  PRINT : PRINT "You only have " ABS ( PEEK (EM) - TL)" mins. 
+      remaining.": PRINT "Insufficient time to download.": GOTO 6200
+6190  GOTO 6210
+6200  PRINT : PRINT "During Prime Time (17:00 to 19:00 EST),": PRINT "time limits on downloads are enforced.": GOTO 1300
+
+Line 6170 defines prime time, and line 6200 tells the user when prime time is in effect.
+
+
+Temporarily disabling your data libraries
+
+To disable your data libraries, change the first line of your LIB.DATA file so it is a zero. The system will politely inform anyone without level 8 or 9 access that the data libraries are currently unavailable. Level 9 users will be able to navigate to any directory desired.

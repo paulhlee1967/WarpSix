@@ -1,0 +1,12 @@
+Press <Return> to read next new msg. (when all messages are read, hitting
+return again sends you to next forum.)
+
+When reading messages, hit Control-S to pause, Control-Q or Return to
+continue, and Return to skip to next.
+
+C)ontinously read new bulletins          P)ost public bulletin in this forum
+R)epeat last bulletin read               L)ast (prior) bulletin
+M)ail letter to author of current msg.   D)elete a bulletin
+S)kip to desired message by number       N)ext forum
+F)orum selector                          Q)uit to main
+O)ff (logoff system)

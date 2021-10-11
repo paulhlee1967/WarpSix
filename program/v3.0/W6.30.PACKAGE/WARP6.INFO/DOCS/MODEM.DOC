@@ -1,0 +1,255 @@
+
+Warp Six BBS, created by Jim Ferr
+Frank Kucharski, and Scott Johnson
+Public domain version 3.0
+April 2017.
+
+Contents
+
+1) Introduction
+2) Cable Diagrams
+3) Hardware Setup
+4) The Modem.Init file
+
+
+1) Introduction
+
+To avoid frustration, read this file carefully.
+
+Warp Six BBS is designed and tested at speeds up to 19200 bps with the Super Serial Card and to 38400 bps with the IIgs modem port. Follow the instructions in "Getting Started" for modifying the LOGON program to support your modem. This document details modem and cable requirements.
+
+You can also connect to a Raspberry Pi running TCPSER to connect across the Internet. Connection speed can be up to 19,200 through the SSC or GS modem port, with higher speeds through the GS modem port on accelerated machines (57,600 theoretical but not tested). 
+
+
+2) Cable Diagrams
+
+IMPORTANT: Where two signals are mentioned with the "&" sign, you should "jumper" (connect) the two signals together at that end of the cable.
+
+** IIGS cable **
+
+IIGS Mini-DIN-8 male     Male DB-25 (Hayes Smartmodem or compatible)
+
+HSKo  1 ---------------> 4 & 20 RTS and DTR (handshake from cpu)
+HSKi  2 <--------------- 5 CTS (handshake from modem)
+TxD-  3 ---------------> 2 TXD (data from cpu)
+SG    4 & 8 ------------ 7 GND (signal ground)
+RxD-  5 <--------------- 3 RXD (data from modem)
+TxD+  6 unconnected
+GPi   7 <--------------- 8 DCD (data carrier detect from modem)
+(Note: jumpering 4 & 20 together lets you use this cable with either a standard modem or a high speed modem. My thanks to Greg Schaefer, author of ProTERM, for this helpful addition.)
+
+
+IIGS Mini-DIN-8 male     Mini-DIN-8 male (Apple Data Modem 2400)
+
+HSKo  1 ---------------- 2 HSKi  (handshake from cpu)
+HSKi  2 ---------------- 1 HSKo  (handshake from modem)
+TxD-  3 ---------------- 5 RxD-  (data from cpu)
+SG    4 ---------------- 4 SG    (signal ground)
+RxD-  5 ---------------- 3 TxD-  (data from modem)
+TxD+  6 ---------------- 8 RxD+  (data from cpu)
+GPi   7 ---------------- 7 GPi   (carrier detect from modem)
+RxD+  8 ---------------- 6 SG    (signal ground)
+(Use Apple Cable M0197 (service part number [embossed on cable] 590-0552) or have one made up with the same pinouts.)
+
+
+IIGS Mini-DIN-8 male     DB-9 Female (USB serial adapter and Raspberry Pi)
+
+HSKo  1 ---------------> 1 & 6 & 8 DCD,DSR,CTS  (handshake from cpu)
+HSKi  2 <--------------- 7 RTS   (handshake from TCPSER)
+TxD-  3 ---------------> 2 RxD-  (data from cpu)
+SG    4 & 8 ------------ 5 SG    (signal ground)
+RxD-  5 <--------------- 3 TxD-  (data from TCPSER)
+TxD+  6 unconnected
+GPi   7 <--------------- 4 DTR   (carrier detect from TCPSER)
+(a functional cable can be put together with off the shelf parts but your mileage may vary. Not all mini-DIN-8 cables have a wire on pin 7 and there are at least 3 different kinds of null modem adapters. You would need a mini-DIN-8 to DB-25 cable wired as above, a hardware handshaking null modem adapter that crosses RX and TX, RST & CTS, and DTR & DCD, and finally a DB-25 to DB-9 adapter if needed depending on the USB serial adapter you have on your Raspberry Pi)
+
+
+** Apple Super Serial Card Cables **
+
+The SSC.Driver uses the DSR input line to monitor carrier detect, and DTR output to hangup the modem.
+
+(Neat Trick: If you have a genuine Apple Super Serial Card and a "straight" serial cable, you can modify the short cable that goes from the card to the back plate of the computer to make it compatible with Warp Six BBS. To do so, use a pair of pliers or similar tool to push pins 6 and 8 in the DB-25 connector that normally sits on the back panel of the computer. Tape up pin 6 so it won't ground out, and insert the line you pulled out of pin 8 into the pin 6 hole. You have successfully routed DCD into DSR, and that's really all that is "custom" about the cabling for Warp Six BBS.)
+
+
+SSC DB-25 male           to male DB-25 (Hayes Smartmodem or compatible)
+
+GND 1  ----------------- 1  GND  frame ground (this line is OPTIONAL)
+TXD 2  ----------------> 2  TXD  transmit data (from SSC to modem)
+RXD 3  <---------------- 3  RXD  receive data (from modem to SSC)
+RTS 4  ----------------> 4  RTS  request to send (for hardware handshaking)
+CTS 5  <---------------- 5  CTS  clear to send (for hardware handshaking)
+DSR 6  <---------------- 8  DCD  data carrier detect (from modem)
+GND 7  ----------------- 7  GND  signal ground (for all signals but pin 1)
+DCD 8 (leave unconnected!)
+DTR 20 ----------------> 20 DTR  data terminal ready (to hangup modem)
+
+Have the ends of this cable labelled "SSC" and "Modem", as it will not work correctly if plugged in backwards -- the system will function but if a user hangs up on the system, the system won't realize it.
+
+Make sure that NOTHING is connected to pin 8 on the SSC end. If necessary, cut the line from that end to ensure nothing is connected -- the SSC has a pull-up resistor to simulate carrier detect when that line is cut. Without carrier detect, the receiver section of the SSC is inactive, and Warp Six needs the receiver active to ensure commands are received by the modem, and to determine the baud rate of incoming calls. (Note to those with "ModemWorks(tm)" or "ProLine(tm)" compatible cables: Morgan ties DCD "high", and this is compatible with Warp Six.)
+
+Note: Hardware handshaking will not work reliably on the ACIA 6551 chip due to a poor hardware implementation. There may be third parties with "improved" 6551 chips that will work, so the driver does support it. Unless you have one of these improved 6551 chips (and you won't unless you bought it separately) then do not attempt to use hardware handshaking.
+
+
+SSC DB-25 male           DB-9 Female (USB serial adapter and Raspberry Pi)
+
+GND 1  ----------------- 1  GND  frame ground (this line is OPTIONAL)
+TXD 2  ----------------> 3  RXD  transmit data (from SSC to TCPSER)
+RXD 3  <---------------- 2  TXD  receive data (from Raspberry Pi to SSC)
+RTS 4  ----------------> 5  CTS  clear to send (for hardware handshaking)
+CTS 5  <---------------- 4  RTS  request to send (for hardware handshaking)
+DSR 6  <---------------- 20 DTR  data terminal ready (from TCPSER)
+GND 7  ----------------- 7  GND  signal ground (for all signals but pin 1)
+DCD 8 (leave unconnected!)
+DTR 20 ----------------> 8 & 6 DCD,DSR  carrier detect (to hangup)
+
+
+Note: We found that you can also flip the jumper block to terminal and Hook the USB to serial adapter from your Raspberry Pi directly to the Super Serial Card using a DB-25 to DB-9 adapter if needed.
+
+3) Hardware Setup
+
+IIGS Control Panel setup
+
+Under the slots option, make sure that slot 2 is set to "Modem Port". The actual settings for the modem port are not important. Note: if you have a DataLink 2400 modem, slot 2 should be set to "Your Card" and you should refer to the SSC.Driver notes. Always make sure AppleTalk is turned off before trying to run Warp Six. The system will print an error message otherwise.
+
+
+Super Serial Card Setup:
+
+The jumper block on the Super Serial Card should be set to the MODEM position unless noted otherwise. If your jumper block is not labelled, try it as it is. If it doesn't work, flip it around.
+
+Super Serial Card DIP switch settings:
+
+Switch 1               Switch 2
+
+1  2  3  4  5  6  7    1  2  3  4  5  6  7
+
+d  u  u  u  u  u  u    u  u  u  u  u  u  d
+
+(d means down, u means up)
+
+Note: the only critical switch is SW2-6 which must be on (UP) to enable interrupts. If you want to set the switches differently to support another application, you can. Warp Six does not use SSC firmware.
+
+
+APPLIED ENGINEERING SERIAL PRO SETTINGS:
+
+Interrupt-Request switches: (closer to the keyboard)
+
+1-OPEN 2-CLOSED 3-OPEN 4-OPEN
+
+Hardware handshaking switches:
+
+1-OPEN 2-OPEN 3-OPEN 4-OPEN
+
+Also, the cable connected should be on the pins labelled "Modem", not
+"Printer", and the custom cable is required, just as it is documented for the Apple Super Serial Card.
+
+
+Modem Requirements for SSC and GS drivers
+
+If you have a Hayes compatible modem, it must meet the following requirements to work with the SSC.Driver and/or GS.Driver:
+
+1) The modem must support disabling auto-answer with the ATS0=0 command, and must support manual answer with the ATA command. (Note: the Apple Modem 300/1200 can't do this.)
+
+2) It must hangup and return to command state when DTR is dropped. DTR is set via DIP switches or by modem commands, eg. AT&D2. Alternatively, you can enable Hayes hangup in line 40 of LOGON (see above).
+
+3) It must supply a carrier detect signal that follows that of the remote modem. (If DCD is forced TRUE always, the system has no way of knowing when someone has hung up.)
+
+These are absolute requirements. If you wish (and this is not essential unless your modem uses DIP switches, you can pre-configure your modem before running Warp Six, using the following as a guide:
+
+   Hayes & Exact compatible     Hayes 2400 Effect
+    (with DIP switches)         (no DIP switches)
+
+   Set switch 1 UP              Issue AT&D2&W Support DTR
+   Set switch 6 UP              Issue AT&C1&W Follow remote DCD
+   Set switch 5 DOWN            Issue ATS0=0&W Disable auto-answer
+
+The BBS will set the modem up to provide digit result codes, no echo of result codes, and extended result codes with the ATX1 command. If your modem only supports 300 baud, remove the X1 command from the MODEM.INIT text file, as it will cause the system to beep and print "Modem not responding!", over and over. To exit this loop, hit Control-C while the message is on the screen. Then CALL M8 and type BYE to quit.
+
+Hayes Smartmodem 1200 DIP switch settings:
+
+Dip switches   Explanation
+
+1  - Up        Support DTR hangup
+2  - Up        Word result codes (for convenience of other programs)
+3  - Down      Result codes displayed
+4  - Up        Echoes characters in command state (convenience again)
+5  - Down      No auto answer
+6  - Up        Carrier detection enabled
+7  - Up        Setting for single line telephone jack (for most people)
+8  - Down      Command recognition enabled (essential)
+9  - Up        Compatible with Bell 103/212A modems
+10 - Up        Modem hangs up and returns to command state when DTR dropped
+
+(If your Smartmodem 1200 has only 8 switches, simply ignore 9 and 10 above.)
+
+
+DataLink 2400 DIP switch settings:
+
+SW1 - Closed: Interrupts on
+SW2 - Open: carrier follows remote modem.
+SW3 - Open
+SW4 - Closed
+SW5 - Closed
+SW6 - Closed
+SW7 - Closed
+SW8 - Closed
+
+Jumper settings: B-D and A-C or just B-D only.
+
+
+Internet setup using a USB to Serial adapter with Raspberry Pi:
+
+We did our testing with a USB/Serial adapter with a PL2303 chipset. Any adapter should work but stick to the pl2303 chipset for maximum chance for success. Testing was done on a Raspberry Pi 2 running TCPSER from "https://github.com/FozzTexx/tcpser". Again, the setup should work on any Raspberry Pi and any version of TCPSER, but this is what it was tested on. 
+
+
+4) The Modem.Init file
+
+This is a text file that contains initialization commands for your modem. It comes set up for the Hayes Smartmodem 2400:
+
+ATE0V0S0=0S7=25
+ATX1H0
+AT&C1&D2
+
+The third line should be deleted if your modem does not support ampersand (&) commands. The second line should be deleted if you have a Smartmodem 300, or your modem doesn't recognize the X1 command, which is used to enable the CONNECT 2400 result code. The first line contains commands which should work on all Hayes-compatible modems, so there should be no need to edit it.
+
+If you want to insert commands to control the modem speaker (for instance M1 to shut it off), you may do so.
+
+CAUTION: When editing the Modem.Init file, be sure each line ends in a carriage return and there are NO EXTRA RETURNS AT THE END OF THE FILE.
+
+For use with the Hayes ULTRA 96, modify your Modem.Init file so it is like the one below and set hardware handshaking on and bps adjust to no in LOGON.
+
+AT&F&K3E0V0S0=0S7=45
+ATX1H0
+AT&C1&D2
+
+
+Commands Explained:
+
+AT - precedes each command. This is the Hayes "ATtention" code.
+
+E0 - tells modem not to echo command characters
+
+V0 - use non-verbal (numeric) result codes. The driver can't recognize verbal result codes
+
+S0=0 This command sets register 0 to 0, which tells the modem never to answer the phone unless manually commanded by the software to do so with the ATA command, which is issued by the SSC and GS drivers after a '2' (Ring) result. This prevents the modem from answering when the software isn't ready. This should be S0=1 for the IIc driver to enable auto-answer.
+
+S7=25 This command sets register 7 to 25, which is the number of seconds to wait for a carrier. 25 seconds is plenty of time for most modems to make the connection; longer wastes time between false calls. You can set this to 15, 20 or 30 if you prefer. Feel free to experiment.
+
+X1 - sets modem to provide extended result codes to indicate the baud rate of the connection. (Not valid for 300 baud modems.)
+
+H0 - hangs up the modem
+
+&C1   Tells the Hayes 2400 or equivalent to provide a carrier detect signal based on that of the remote modem. This allows the driver to react when a user hangs up on the system. Set to &C0 for IIc driver (if modem uses & commands).
+
+&D2   Tells the Hayes 2400 or equivalent to hangup and go to command state when the DTR (Data Terminal Ready) line is negated. This is the preferred method for hanging up the modem. You can also set the system to use the Hayes hangup method, in which case you can delete this command from Modem.Init, or use &D0 instead. Set to &D0 if you won't be using DTR to hangup.
+
+If you hate modem noise, you can add an M0 command to the file to shut off the modem speaker, assuming your modem accepts this command.
+
+Commands added for high speed modems:
+
+&F    resets modem to factory default. Used with Hayes ULTRA 96
+
+&K3   sets modem to use hardware handshaking. Must also be enabled in LOGON.
+
+S37=45 sets carrier wait time to 45 seconds instead of 25 seconds.
+
+Note: the carriage return at the end of each of the lines is important. After the driver sends a line, it pauses for about a second to allow the command to take effect. Then the next line, if any is sent. The driver never waits for a response after the first line, but after each subsequent line, the driver waits for the OK result code in digit format (a zero). If the zero (OK result) is not received, the driver returns an error 3 to AppleSoft, and Warp Six beeps and prints "Modem not responding!" on the sysop screen. (Hit Control-C to exit this loop.)

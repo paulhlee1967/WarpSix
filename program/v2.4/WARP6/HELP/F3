@@ -1,0 +1,62 @@
+Transfer Section Explained
+
+Warp Six supports the original Xmodem protocol and a number of extensions
+that have been added to it over the years. Warp Six supports the following
+extensions to Xmodem:
+
+- The 16-bit CRC option, which provides more reliable error checking.
+
+- ASCII Express Pro(tm) ProDOS Extension, which includes ProDOS file info
+  during the file transfer.
+
+- Binary II Extension, which includes ProDOS file type and size info during the
+  file transfer.
+
+- MacBinary Extension, which includes Macintosh file info *.
+
+- 1K block size option, which allows for faster transfers.
+
+- 4K block size option which allows for even faster transfers on "clean" phone
+  lines.
+
+- Ymodem batch SEND (download to user) with or without extensions
+
+* Warp Six can receive files with MacBinary information, but will only
+send MacBinary if the file being sent was originally uploaded that way.
+
+When you upload a file to the BBS, it will automatically recognize (or
+accept) any of these extensions or allowable combinations. When you
+download a file from the BBS, you have to tell the system what kind of Xmodem
+file transfer your communications software can support.
+
+If you are a Mac user, do not confuse Binary II with MacBinary -- they are
+not the same. When downloading a Macintosh file, just specify normal or
+1K Xmodem, depending on the capabilities of your terminal program.
+Xmodem 4K is not yet popular in Macintosh communication programs and
+therefore is not likely to be recognized by your terminal program.
+
+If you are an Apple II user and your terminal program supports Binary II,
+use it for downloading. Binary II ensures the file type, size, creation
+and modificaton dates are the same on your copy of the file as the original.
+If your terminal software doesn't support Binary II, you can still use it
+and have another program like BLU (Binary Library Utility) or ShrinkIt
+extract the file complete with its type and other attributes.
+
+When uploading, if you tell the system to recognize Binary II, it will remove
+the Binary II header and save the file with its original attributes. For
+example, if you upload a file called TEST.BXY and tell the system to
+recognize Binary II, the file will be saved as TEST.SHK, as the .SHK file is
+what the Binary II header describes.
+
+So, if you use Binary II for uploading, specify the filename the finished file
+will have. (In the example, that would be TEST.SHK.) Otherwise the description
+you give the file will not match filenames with the file after
+uploading.
+
+One final note about Binary II: although the specs for Binary II allow
+for multiple files to be sent, the system will refuse to receive a Binary
+II archive containing multiple files. For sending many files in one, use a
+utility like ShinkIt, which can create a NuFX archive containing multiple
+files. For receiving multiple files, you can download via Ymodem.
+
+end.

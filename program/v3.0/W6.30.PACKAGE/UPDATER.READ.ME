@@ -1,0 +1,59 @@
+NEW INSTALLATION
+================
+
+Extract this archive to a location of your choice.
+
+If you are installing for the first time, then stop reading this file and go to the docs folder. It's located at WARP6.INFO/DOCS. Start with the READ.ME.FIRST file. Next will be GETTING.STARTED. Next would be MODEM.DOC, WARP6.DOC and SYSOP.DOC. That should be enough to get you up and running. The TROUBLE.DOC will help out with common problems. The other files will help you understand how to modify your system to your own liking. To save a bit of space, UPDATER and FILE.LIST can be deleted as they won't be used in a new install.
+
+Good luck and have fun!
+
+
+Upgrade from any earlier version of Warp Six to PD3.0
+===============================================
+
+I hope you read this file first as it will help you understand what is about to happen and how you can make it go as smoothly as possible.
+
+First of all, to update your BBS you will need free space on your drive.
+
+- To update with a copy with the WARP6.INFO folder on your volume at the default location of /volumename/WARP6.INFO (right next to the WARP6 folder) you will need about 275K free space.
+
+- To update when a copy of WARP6.INFO is not on your volume you will need about 415K free space.
+
+- If you don't have your BBS setup at default paths or you have modified things extensively then it could require more or even less space.
+
+In order to upgrade your working system, extract this archive to anywhere you prefer. It can be on the same volume as the BBS or a different one. The updater program will detect where it's at and if it somehow gets it wrong, it will prompt you to fix the path. 
+
+If for some reason you are running your BBS from 5.25" floppies then this might go badly. You can run UPDATER up till it prompts to start copying files. At this point I have no way to check for disk space from Applesoft so you should abort the file copy and do it manually. There is a list of new files that are needed and where they need to go from and to in a file named FILE.LIST. It's a regular text file so you can open it and read it easily. The format is as follows.
+
+- The first line is how many groups of files there are in the file. Each group gets copied to a single folder.
+- The second line is how many files are in the group that immediately follows.
+- The next line is the path where they are located in the updater package and also where they go in your running system.
+- The next line(s) are the file(s) in this group.
+- After the first group it repeats with a line with the number of files, then a line with the path, and finally another group of files, etc. 
+
+If you're running from a 3.5" floppy or a mass storage device then you should have no issues.
+
+Launch the UPDATER program from right where it is. It will prompt you for the full path to your BBS. It will offer the default path for you to accept. If you have modified your system, you will need to enter the proper path.
+
+The program will remind you that you should have a backup and give you the chance to quit and do that. BACKUP YOUR SYSTEM! I don't gaurantee anything in this package. I have tested it but not exhaustively. (Let's face it...there's probably only 3 people who are ever going to use this.) Things could still go terribly wrong...
+
+Once you choose to continue, UPDATER will do a preliminary check of your version. If it detects version 3.0 installed it will inform you of that and exit. Otherwise it will get some more information about your system loaded into variables and save them to a file on a ram disk in memory for temporary safe keeping. It then loads the version 3.0 modem driver and the v3.0 file copy module. The file versions must match to load properly and since early versions of Warp Six didn’t have the copy module, I decided to use the new version all the time. All of this binary loading blasts the variables and pretty much anything you had in memory. (this is why we saved that file to /ram) UPDATER now chains to itself at the next line. This loads the program back into memory and fixes all the stomping that the driver and copy module did, then loads the variables back from the ram disk and continues.
+
+UPDATER will verify that it can find the update folder and necessary BBS folders. It will prompt you if it detects a non-standard system and prompt you again to be sure you did a backup.
+
+UPDATER will now attempt to determine your exact version. It checks your version in the REC.DATA file. If it does not recognize your version it will prompt you for help. Once your version is determined, the system will be updated in steps. If you have a shareware version it will make changes necessary to be compatible with public domain version 1.0. It will then continue on and make changes to be compatible with PD version 2.5. Finally it will make the changes needed for the version 3.0 update. The program will show you on screen what it is working on. If you have an accelerated system then good luck reading it. It goes by QUICK.
+
+Once the configuration files and forums have been updated, you need the new files. UPDATER will take care of that for you. IT DELETES YOUR OLD FILES so if you have modified your system, then I really hope you backed it up! The progress is shown on the screen. Once it is done copying files, it will prompt you for which modem driver you want to use. If you have a //e or a ][gs with a super serial card then you want the SSC driver. If you have a ][gs and you’re using the modem port, then choose the GS driver. If you would like to test the system before putting it back up live, then choose the local driver. UPDATER will copy the proper files and rename them appropriately.
+
+If you choose to test drive the system on the local drivers, then it is up to you to copy the proper live driver when you’re done. The drivers are in the WARP6.INFO/DRIVERS folder right next to your WARP6 folder that holds you BBS files..
+
+Version 3.0 comes with BlackJack preinstalled for you to play with. Other door games can be added as well. Instructions are in the DOORS.DOC. That’s also where you find directions on how to disable door games. If you already had a DOORS folder in your WARP6 folder then the new files have been added there. If not then one was created.
+
+You should be good to go now!
+
+You can now safely delete the extracted archive to reclaim disk space. You can also copy the WARP6.INFO folder elsewhere. It is not needed to run the system.
+
+One strange issue I have seen, though rarely, is an ERROR 9 while copying files. ERROR 9 is a DISK FULL error and when I got it I had over 3 MB still free. I don't understand it. If this happens to you, simply go to the WARP6/BBS folder of your BBS and delete SYS.DATA. Rename SYS.DATA.OLD to SYS.DATA. Now go into the WARP6/LOGS folder and delete REC.DATA and then rename REC.DATA.OLD to REC.DATA. Now run UPDATER again. It will go through the same prompts, recreate your new SYS.DATA and REC.DATA, and then it should copy your files without a problem.
+
+If you have problems and can't sort them out, You can find me in the Apple II Enthusiasts group on Facebook. You can also send me an email at Scott@IowaJohnsons.Com. I'll do what I can to help.
+

@@ -1,0 +1,20 @@
+Xmodem checksum is for old programs that don't support CRC.
+Xmodem CRC is most prevalent and provides better error checking.
+Xmodem 1K uses CRC and is faster due to its larger packet size.
+Xmodem 4K uses CRC and is even faster for similar reasons. (Mainly Apple II)
+Ymodem is for downloading more than one file at a time.
+
+Compatibility notes:
+
+Macintosh users should enable the MacBinary II on their communications
+software before uploading or downloading. Mac users should say no to the
+Binary II and ProDOS extensions.
+
+Apple II users should use ProDOS or Binary II extensions. When uploading,
+ProDOS is much preferred, as Binary II uploads will change the filename: if
+the file is called TEST.BXY, tell the BBS to receive TEST.SHK.
+
+Some Apple II programs (eg. Talk Is Cheap v3.09) don't like Xmodem 1K and 4K
+uploading, but will send 1K or 4K if you just specify CRC when the BBS prompts
+you for a protocol. Note: ProTERM 3 Ymodem ProDOS receive works great with
+Warp Six BBS.

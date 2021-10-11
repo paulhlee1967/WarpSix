@@ -1,0 +1,72 @@
+Forum level explained
+
+At the heart of any bulletin board system are its bulletin boards: the
+place where public messages are posted. On Warp Six, bulletin boards are called forums; they are sometimes known as conferences or other more imaginative names on other systems.  It's in the forums that members share their knowledge, wit and charm.
+
+You can tell you're in a forum by the "Forum (2) : " prompt.  The "2"
+(in this case) indicates you are in forum 2.
+
+Once in a forum, pressing Return will read you the first "new" message you
+haven't read, or will tell you there are no more new messages. If you hit
+Return after being told there are no more new messages, the system will prompt you for the next forum you wish to enter.
+
+Each forum remembers the message you read there last, and will start from
+the next message (if any) the next time you press Return on that forum.
+
+Valuable feature: pressing the spacebar will abort the current message; hitting Return will abort it and send a Return to the software, which will either read the next message immediately, or let you know there are no more new messages. (When reading, you need not take your hand away from the Return key at all!)
+
+As usual, Control-S will pause any bulletin in progress; Control-Q or
+Return will continue.
+
+C)ontinously read new bulletins
+
+  Puts you in continuous mode, which you can abort with the spacebar. This
+  will read all the new messages in the forum you are currently in and then
+  automatically continue to read new messages in all forums following the one
+  you are in.
+
+P)ost public bulletin in this forum
+
+  Lets you add a message to the forum. Normally when asked who to post to,
+  you can say "All". If, however, you are posting a reply to the message you
+  just read, you can hit Return to accept that author's name as the default
+  "To:". You will also be prompted for a subject. If you hit Return there,
+  the system will assume you don't want to post anything.
+
+M)ail letter to author of current msg.
+
+  Similar to post, but allows you to compose a private message to be sent
+  via electronic mail. Carbon copies are supported here.
+
+D)elete a bulletin
+
+  Allows you to delete any bulletins you have posted.
+
+S)kip to a different message
+
+  This valuable feature lets you tell the system what bulletin to read next.
+
+L)ast (prior) bulletin
+
+  Reads the bulletin prior to the one you just read, in effect letting you
+  read bulletins in reverse order.
+
+R)epeat bulletin last read
+
+  -self-explanatory-
+
+N)ext forum
+
+  Sends you to the next forum.
+
+F)orum selector
+
+  Allows you to select another forum.
+
+Q)uit to main
+
+  Returns you to the main menu.
+
+O)ff (logoff system)
+
+  Disconnects you from the BBS.

@@ -1,0 +1,65 @@
+How to play BlackJack
+---------------------
+
+The objective of BlackJack is to get as many cards as it takes to get as
+close to, but not over 21. The 2, 3, 4, 5, 6, 7, 8, 9 and 10 cards are all
+face value with the Jacks, Queens and Kings being worth ten points each.
+
+The Aces are treated differently whereas you can select their value to
+represent either 1 or 11 points. In other words, and Ace and a Jack can
+equal either 21 or 11 depending on what value you selected for the Ace.
+
+To start the game the player enters "D" for Deal and then the dealer will
+ask for the amount of your bet. After the amount is entered (the minimum
+bet is $10), you will be dealt a card and the dealer will draw a card as
+well.
+
+In addition to entering "D" to start the game you can also hit "?" for the
+options menu. The options consist of the following:
+
+? -- Lists the options menu.
+D -- Start the game.
+H -- Gets you this file.
+Q -- Quits BlackJack, saves your winnings and returns you to the BBS.
+O -- Quits BlackJack, saves your winnings and logs you off the system.
+B -- Another way to leave the system.
+
+Anyways, after you have been dealt a card and the dealer has drawn one,
+you have the option to hit or stand.
+
+To stand means to keep what you have (if you have a King and a nine, you
+probably want to remain there as not to go over 21) and to hit means that
+you wish to draw another card.
+
+You can elect whether to Hit or Stand by entering "H" or "S" respectively.
+
+By the way, if you have enabled hot keys at the BBS main menu, they are
+supported here.
+
+After you have finished hitting, and enter "S" for stand, the dealer takes
+their turn, trying to beat your value without going over 21.
+
+The dealer must hit if their cards are 16 or lower and will stand at 17
+or greater. If the dealer goes over 21, they lose. If the dealer ties your
+value, they lose. If they beat your value without going over 21, they win.
+
+A BlackJack consists of an Ace and a King, Queen, Jack or 10.
+
+If you get dealt a BlackJack, you win with a payoff on your bet of two to
+one.
+
+If the dealer gets a BlackJack, you lose.
+
+If your money drops below the minimum bet ($10), the dealer will have the
+bouncer escort you from the lounge. Otherwise you can quit to the BlackJack
+menu by hitting "Return" without entering a bet.
+
+If you have more than $100 when you leave, your winnings will be saved for when
+you come back the next time. If you have less than $100 when you
+leave, you will still find $100 in your account the next time you play.
+
+The system also remembers the last date that you played on and you will be
+only allowed to play once in one calendar day. If you try to play more
+than once in a calendar day, you will be "escorted" back to the BBS.
+
+Have fun!

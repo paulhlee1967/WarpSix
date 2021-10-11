@@ -1,0 +1,15 @@
+Y)our stats. - Displays your user statistics.
+P)assword change - Change your logon password whenever you choose.
+T)ime remaining - Shows time limit per call and time remaining this call.
+H)otkeys enable/disable - Sets whether the BBS requires a <return/enter>
+                          when answering a prompt which needs one character.
+                          EG: Continue? (Y/N) : _
+S)creen clear enable/disable - When enabled, each message will always start
+                               at the top of the screen.
+F)orum attend enable/disable - Tell the BBS which forums you wish to read
+                               when using the Quickscan or Continuous
+                               Quickscan modes. You can still use the Forum
+                               Selector to read messages in ANY forum, even
+                               if it is disabled.
+Q)uit - Return to main menu
+Off - Logoff the BBS

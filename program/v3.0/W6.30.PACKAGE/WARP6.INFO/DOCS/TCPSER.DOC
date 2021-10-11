@@ -1,0 +1,151 @@
+IMPORTANT NOTE:
+
+This How To is geared toward the Raspberry Pi. As such the tcpser binary
+included is complied for the Pi and its ARM processor. If you want to set up
+tcpser on a Linux workstation or server running a different processor, you
+will need to download the source and compile it. The tcpser included is
+compiled from the FozzTexx tcpser fork which has been found to be the most
+reliable for this purpose.
+
+https://github.com/FozzTexx/tcpser/
+
+
+================
+
+
+Setting up tcpser for Warp6
+
+
+
+1. COPY TCPSER TO YOUR PI
+=========================
+Transfer the tcpser binary to your Raspberry Pi. Options include downloading
+this archive directly to the Pi, emailing it to yourself and accessing that
+email on the Pi, SCP, or some other means. Once you have it there, drop it into
+the shell.
+
+
+
+2. GRANT PERMISSIONS AND MOVE INTO /BIN
+=======================================
+Grant tcpser executable permissions by entering the following at the
+command-line within the same directory as tcpser:
+
+$ sudo chmod +x tcpser
+
+Next, move tcpser into a folder included in your system path such as /usr/sbin
+or /usr/bin. To do that, enter this on the command line:
+
+$ sudo cp tcpser /usr/bin/
+
+
+
+3. CONNECT USB-TO-SERIAL ADAPTER
+================================
+Connect your USB-to-Serial adapter then execute the following at the shell
+prompt:
+
+$ dmesg
+
+Look for a line near the bottom that looks something like this:
+
+[3934863.916644] usb 1-1.5: pl2303 converter now attached to ttyUSB0
+
+Note the "ttyUSB#". You’ll need this information to start tcpser. If you do not
+see a line like this, you won’t be able to launch tcpser. Try a different USB
+port on the Raspberry Pi or a different USB-to-Serial adapter.
+
+
+
+4. ASSEMBLE YOUR TCPSER COMMAND
+===============================
+Assemble the options you'll use to start tcpser. Below is an example with the
+minimum you'll need to ready tcpser to answer calls.
+
+$ tcpser -d /dev/ttyUSB0 -s 2400 -i "s0=1" -p 6502
+
+The options are explained below:
+
+-d = Which USB/Serial device to attach to, in this case ttyUSB0.
+-s = Baud rate tcpser will emulate (I like 2400 bps, but can be higher or lower).
+-i = Send the following "initialization string" to the "modem" upon launch. In
+       this case, "s0=1" means answer on the first ring.
+-p = This is the incoming Telnet port. Again, can be anything as long as it
+        doesn't conflict with something running on the Pi. 
+
+There are many other options you can use. Execute the following at a prompt to
+see the others:
+
+$ tcpser -?
+
+The following are provided for your convenience:
+
+Usage: tcpser <parameters>
+-p port to listen on (defaults to 6400)
+-- or --
+-p ip_address:port to specify which ip address and port to listen on.
+-t trace flags: (can be combined)
+'s' = modem input
+'S' = modem output
+'i' = IP input
+'I' = IP output
+-l 0 (NONE), 1 (FATAL) - 7 (DEBUG_X) (defaults to 0)
+-L log file (defaults to stderr)
+
+The following can be repeated for each modem desired
+(-s, -S, and -i will apply to any subsequent device if not set again)
+
+-d serial device (e.g. /dev/ttyS0). Cannot be used with -v
+-v tcp port for VICE RS232 (e.g. 25232). Cannot be used with -d
+-s serial port speed (defaults to 38400)
+-S speed modem will report (defaults to -s value)
+-I invert DCD pin
+-n add phone entry (number=replacement)
+-a filename to send to local side upon answer
+-A filename to send to remote side upon answer
+-c filename to send to local side upon connect
+-C filename to send to remote side upon connect
+-N filename to send when no answer
+-B filename to send when modem(s) busy
+-T filename to send upon inactivity timeout
+-i modem init string (defaults to '', leave off 'at' prefix when specifying)
+-D direct connection (follow with hostname:port for caller, : for receiver)
+
+
+5. START TCPSER
+===============
+Once you've determined your options, start tcpser. When you want to stop it,
+tap CTRL-C.
+
+Note that tcpser will need to run continuously in order to answer calls. If
+you launch a terminal session, start tcpser, then exit the terminal session,
+tcpser will quit. One way around this is to use the screen command to start a
+new terminal session, start tcpser, then detach from that session. Using
+screen is a complex topic but here are the general steps you can use:
+
+* Start a terminal session.
+* Execute "screen" at the command prompt. Typically this will clear the screen
+   and give you another prompt.
+* Enter your tcpser command with options.
+* Once you can see tcpser running, tap CTRL-A, then tap 'd' on your keyboard.
+   The screen will clear and you'll be back at your prompt.
+
+tcpser is now running in a detached screen session. You can safely close the
+terminal window. When you want to get back to it:
+
+* Start a terminal session.
+* Execute "screen -rd"
+
+This brings you back into the tcpser detached screen session. If you want to
+quit tcpser, tap CTRL-C. You'll get back to a prompt and can relaunch tcpser
+if you want. 
+
+
+======
+
+tcpser is ready to answer calls for your Warp6 BBS. Next step is cabling
+(detailed in the Warp 6 MODEM.DOC file) and reading the Warp6 documentation
+to setup and modify the BBS. 
+
+Have fun!
+

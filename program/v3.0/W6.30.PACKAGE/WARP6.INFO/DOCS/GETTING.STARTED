@@ -1,0 +1,324 @@
+Getting Started - Warp Six BBS - Page 1
+
+Warp Six BBS, created by Jim Ferr
+Public domain version 3.0 by Jim Ferr, Frank Kucharski, and Scott Johnson.
+November 1995.
+
+
+Table of Contents
+
+ i)   Introduction
+ ii)  Adding ProDOS and BASIC.System
+ iii) Hardware requirements
+
+ 1)   Configuring Warp Six BBS for your hardware
+ 2)   Personalizing your BBS
+ 3)   Logging on for the first time
+ 4)   Installing "live" modem drivers
+ 5)   Summary of changes you can make to the LOGON program
+ 6)   Other enhancements to your system
+
+i) Introduction
+
+    Warp Six BBS comes preconfigured to run from a single ProDOS volume like a hard disk or 800K floppy. If you are in a hurry to try the system, make sure the volume name you put the Warp Six files on is called "/HD1". As supplied, Warp Six BBS has modem-disabled drivers so you can try the system without worrying about a serial interface or modem. Warp Six requires an Enhanced IIe or a IIgs.
+
+    If you want to put the files on a volume that will not be named "HD1", change all occurrences of "/HD1" in the Sys.Data file to the name of your hard disk. The Sys.Data file is located in the WARP6/BBS directory. If you need more information, or would like to run Warp Six BBS on multiple volumes, please refer to "Setting Up Pathnames" later in this document.
+
+
+Figure 1: Warp Six Files and Directories
+
+Startup -- short Applesoft program to start the BBS
+ (the startup program in the BBS directory will also work, if you have a
+ clock.)
+/Warp6 -- directory containing all BBS subdirectories
+   /BBS -- the BBS programs and menus
+   /Xfer -- file transfer section programs and menus
+   /Logs -- holds user files and system logs
+   /Help -- system help files
+   /Gen -- "general files"
+   /EMail -- holds private electronic mail
+   /Library -- empty data library
+   /Doors -- Door game launcher files and any door games
+
+ /Warp6.Info
+   /Docs -- contains the documentation
+   /Drivers -- contains "live" modem drivers
+   /Extras -- extra utilities
+
+    Everything under the /Warp6 directory is required by the system when it is running, with the exception of the contents of the Library directory. The files under the /Warp6.Info directory do not have to be available when the system is running and therefore can be safely stored anywhere you desire.
+
+
+ii) Adding ProDOS and BASIC.System
+
+    Before running Warp Six, you need to have ProDOS 8 and BASIC.System. These files are not supplied, as that would entail paying Apple Software Licensing a yearly fee, and this software is now in the public domain. Warp Six is written in AppleSoft BASIC under ProDOS 8 and can be started from any volume that contains the files "PRODOS" and "BASIC.SYSTEM", or from the Finder on the Apple IIGS.
+
+    As of this writing, the current version of ProDOS 8 is 2.0.3 and BASIC.System is 1.5. It is usually best to use the latest version available, but Warp Six will function with older versions.
+
+
+iii) Hardware Requirements
+
+Computer:
+
+    Enhanced Apple IIe with extended 80 column card (128K minimum RAM) or Apple IIGS (any ROM version).
+
+Clock:
+
+    A ProDOS compatible clock is almost essential: If you don't have a clock in your system, Warp Six BBS will run anyway -- the startup program will prompt you to set the ProDOS date, but time limits will not be enforced and the system will need the date manually entered every day. (If you have a IIGS, you have a built-in clock and don't need to add any hardware.) Warp Six BBS does not access clock hardware directly, so it is fully compatible with all clocks that ProDOS can recognize, or be patched to recognize.
+
+Memory:
+
+    Warp Six works in the main 64K of your IIe and stores some essential files on the 64K RAMdisk which ProDOS automatically creates. It works on the IIGS without the addition of any memory card.
+
+Disk storage:
+
+    ProDOS mass storage device, for example, a 800K drive or hard disk. A hard disk is highly recommended. A CFFA3000 is also a good choice.
+
+Serial Interface:
+
+    Warp Six BBS requires a built-in modem port of a IIGS or an Apple Super Serial card or fully compatible card. Warp Six BBS *may* work with the Applied Engineering Serial Pro or the Applied Engineering DataLink 2400, but it has not been fully tested with these products.
+
+Modem:
+
+    Warp Six BBS is designed to work with Hayes and compatible external modems up to 19200 bits per second (bps) with the Super Serial Card or equivalent, or up to 57600 bps on a IIGS that is accelerated, or 19200 on a IIGS without an accelerator. If your modem is "fully" Hayes compatible, you should not experience any problems, PROVIDED you follow the recommendations in this document, "Read Me First" and "Modem Doc".
+
+    The DataLink 2400 should work with the SSC.Driver. DataLink owners should read Modem.Doc for jumper and switch setting information. The DataLink 1200 is not supported by Warp Six BBS.
+
+A Raspberry Pi running TCPser can be used as a modem to connect over the internet. There are more details about this in the "Modem Doc"
+
+Cable:
+
+    You absolutely must have a custom cable for your external modem to work with Warp Six BBS. This isn't as difficult as it may sound, and the cable is compatible with other software. You might be able to use an existing cable, or modify an existing cable. There's no need to worry about this until you are certain you will be running a Warp Six BBS. Feel free to explore the system before hacking apart your modem cable. You can refer to the Modem Doc file at any time for the gruesome details.
+
+
+1) Configuring Warp Six BBS for your hardware
+
+Apple IIe Enhanced
+
+    No special configuration is required. Your IIe must be enhanced and contain an Apple Extended 80 column card; any version.
+
+    If your IIe is not enhanced, it will not work with Warp Six. To determine if your IIe is enhanced, watch the top of your screen when booting. If you see "Apple //e", you have an enhanced unit; otherwise you will just see "Apple ][". The IIe Enhancement Kit is Apple part number A2M2052. It may be hard to find, so you might have to order the necessary chips separately. In fact it may be cheaper to buy them separately. Here are the individual Apple Service part numbers:
+
+Part #    Description   Coordinates on logic board
+
+342-0304  CD ROM        D8
+342-0303  EF ROM        E8
+338-6503  65C02 cpu     B4
+342-0265  Video ROM     F4
+
+
+Apple IIGS
+
+    To use Warp Six BBS on a IIGS (any ROM version up to the current ROM 03), set your Control Panel so that slot 2 is "Modem Port". The actual modem port settings in your Control Panel do not matter.
+
+
+2) Personalizing your BBS
+
+    When you launch a new bulletin board system (or change an existing one), you want to make it your own creation as much as possible. First, you should choose a name for your system, and edit the Sys.Data file to change the name from the default, "Another BBS", to the name of your choice. Your system's name is very important, as it may be the only thing to distinguish your BBS from tens of other bulletin boards in your calling area. The name you choose should be relatively short and unique. Commas and colons cannot be contained in the system name.
+
+    The system name should fit into phrases like "Welcome to <system name>", and "Thank you for calling <system name>", as these phrases are used automatically by the system at logon and logoff. You may want to consider where the various names you are toying with fit into an alphabetical list of bulletin boards in your area. (This probably explains why so many system names start with the letter "A".) Such considerations may seem trivial -- maybe they are! Once your system is established, you will get new users by word of mouth without any effort on your part.
+
+    You'll need a text editor or word processor such as Apple Writer // 2.1 (ProDOS) -- now freeware, or a similar program to edit ASCII text files. (Take a look in the data library included -- I may have included a freeware program of some description.)
+
+    When editing the Sys.Data file, keep in mind it has a set structure. Each line is a "field", used for a set purpose. DO NOT ADD ANY COMMAS OR COLONS to the Sys.Data file, as those characters are recognized as "field separators" when the system is using the Applesoft BASIC "INPUT" command to read the file. Here is the definition of the Sys.Data file structure:
+
+Sys.Data, type TXT (normal text file)
+
+RT$   Root Pathname for system (where programs & menus located)
+FP$   Forum dir pathname (where FORUM.n dirs located)
+EP$   Email dir pathname (where EMAIL, UPLOADS, GEN & HELP dirs located)
+LP$   Logs dir pathname (where user files and logs are found)
+TP$   Where transfer section programs and menus are found
+DP$   Door games pathname (all things door game related)
+SN$   System Name (you choose this yourself)
+SP$   Sponsor name or logoff message -- not used but can't be empty
+RP$   Remote Password (Sysop only)
+HR$   Hours/baud rate/phone number of system
+FC    Forum Count: total # of forums (Do not modify)
+CD$   Current date in ProDOS format
+CT    Call Total for System (Updated automatically)
+GU    Guest user account number (default '9999' is inactive)
+
+IMPORTANT: The pathnames must start with a slash, but not have a trailing slash or any trailing spaces. Pathnames should be in upper case only. The remote password (REMOTE) must be in upper case and not be longer than 7 characters. Do not modify the forum count field; the BBS maintains this number. The guest user feature defaults to inactive. There will be instructions on how to activate it later if you wish.
+
+Here is what the Sys.Data file looks like, as supplied:
+
+/HD1/WARP6/BBS
+/HD1/WARP6
+/HD1/WARP6
+/HD1/WARP6/LOGS
+/HD1/WARP6/XFER
+/HD1/WARP6/DOORS
+Another BBS
+an adventure in online communications.
+REMOTE
+(905) 555-1212 24 hrs. 300-57600 bps
+0
+23-JUN-94
+0
+9999
+
+    Here is a list of other "free form" text files to personalize, with some comments. You should ensure each line ends in a carriage return, and does not exceed the screen width most of your callers will use. (Usually 80 columns.)
+
+BANNER      -- file displayed at logon before caller is prompted for ID
+BANNER.PSE  -- displayed at logon if caller has ProTERM Special Emulation (*)
+BANNER.ANSI -- displayed at logon if caller has ANSI Emulation (*)
+SYS.NEWS    -- this file is shown to callers at logon
+ABOUT.US    -- tell users about your BBS, for the A)bout this BBS menu item
+AGREEMENT   -- user agreement; modify to suit your needs
+NEW.INFO    -- tells new users about your BBS when they logon as 'NEW'
+
+(*) You will need documentation for the codes required for these emulations and a text editor capable of using control codes embedded in the text. These files should not be altered unless you know what you're doing.
+
+    For the next few paragraphs, I'll be describing small changes you make to some of the supplied BASIC programs to set your preferences. I have to assume you know how to load, edit and save Applesoft BASIC programs. If you don't, please consult a friend, user group, manual or book on AppleSoft BASIC before attempting any changes.
+
+    Will you be running an alias system which allows users to sign in with a fake name or "handle", or a "normal" system where people are expected to use their real names? To activate aliases, you must edit the following line of the LOGON program. The variable AF should be set to 1 for aliases, or 0 for real names:
+
+1010 AF = 0:BE = 1:CL = 3:LL = 15:TL = 10:VW = 79
+
+    In the same line, you decide if you want to hear a beep or a quiet speaker click when a user selects the Y)ell for sysop command. The variable BE stands for beep. If BE=0 then it will always click; if BE=1 it will beep during normal hours, and click after hours, assuming you have a clock. (Otherwise the system thinks it is 12:00 am all the time). The hours for beep versus click are set in line 8500 of the Warp6.BBS program:
+
+8500 ON NOT BE GOTO 8520: GOSUB 5300: IF VAL (LEFT$(T$,2)) < 9 OR VAL(LEFT$(T$,2)) > 22 THEN 8520: REM No beeps before 9 am or after 10 pm
+
+    The times to start and stop beeps are in the "IF VAL" statement. The values 9 and 22 represent 9:00 am and 22:00, ie. 10:00 pm. You can set longer or shorter start beep / stop beep times to suit your needs.
+
+    Also in line 1010 of the LOGON program, the variable LL defines the maximum number of letters a user can receive before the system reports their "mailbox is full" (LL = 15, ie. letter limit is 15 letters). (The sysop's mailbox is reported full after it has 2 times LL letters in it.)
+
+    Also in the same line (this is a good line to know about!) is the call limit per user per day in variable CL, as in how many is the maximum number of calls a normal user can call the system on the same calendar day without getting logged off with a message. The default is "CL = 8", ie. 8 calls per day maximum, which is generous. Some users like to call three or four times per day and logoff quickly; others do everything in one shot, so the call limit is a very subjective setting. Warp Six does not have control over how many minutes per day a user can use. Your timing controls are limited to user time limit, calls per day limit and the idle timer -- which is described in Warp6 Doc.
+
+    Finally, the starting time limit is 10 minutes and the full screen video width is 79 characters. These values should not be changed. In particular, 79 character is the maximum video width supported if you want word wrap to look good on the sysop screen. The starting time limit is only used during the logon process and for new users signing on.
+
+    A bit of an explanation of security levels: Unvalidated "new" users have level 0. Validated users have level 2. Levels 3 to 7 you can use any way you like, to limit access to various forums or transfer data libraries, level 8 is co-sysops, and level 9 is Sysop. No one is immune to the inactivity timeout. A timeout is when no input is given for about four minutes. After the timeout period has expired, the system will send a brief message and a Control-G to "beep" as a warning. It will then disconnect if the user does not respond within 30 seconds. In the system detail log, such calls will have a result code of 2. (RC=2). Here is an example:
+
+# 3433 On 29-JAN-92 21:00 for 00:05 ID 1023 : LAZY JANE RC=2 BR=3
+
+    The BR=3 means the baud rate of the call was 2400. (1=300, 2=1200, 3=2400, 4=4800, 5=9600, 6=19200, 7=38400, 8=57600.) At high speeds, all calls will appear to come in at your maximum bps rate, as Warp Six only reports the connect speed, not the actual carrier speed. You can view the detail log by entering a caret (^) at the main menu.
+
+    User time limits are defined in lines 2030 to 2080 of the LOGON program. The method used as a default sets TL to 30 (time limit equals 30 minutes) and adds 10 more minutes if the user is a "member", an extra 5 minutes if the user has posted more than 10 bulletins (public messages), another 10 minutes if the user has posted over 50 bulletins, and an extra 5 minutes if the user is calling at 300 baud. You can, of course, change the base time limit and the method for adding extra time under various conditions.
+
+    Do you want to give new users instant read-only access to your system, or do you want to lock them out completely until they have been "validated"? In line 1920 of the ADD.USER program there is a "GOTO" statement which gives users instant read-only access. If you delete this line or make it a REM statement, users will be told to call back in a few days. You must also edit line 1810 of LOGON -- it is currently a REM statement. To lock out new users who call back until they are validated, the line should read:
+
+1810 IF SL = 0 THEN PRINT:PRINT"Sorry, you aren't validated yet.": GOTO 5000
+
+   Also in Add.User, line 2150 controls how many messages will be "new". Messages in each forum are numbered consecutively from 10,000 and go up from there. The variable RL holds the message reference number the user "read last". The statement RL = LB - 2 will make 2 messages new. If you want the user to have 10 messages new per forum, change the 2 to a 10.
+
+2150 RL = LB - 5: IF RL < FB THEN RL = FB: REM Make 5 msgs new in each forum
+
+In addition, you can activate a new user survey at line 2500 of ADD.USER, by changing the entire line to a REM statement.
+
+2500 REM RETURN : REM New user survey (REM entire line to enable)
+
+    The new user survey asks users what source referred them to your BBS, and appends the answer to a file called New.Survey in your /Logs directory.
+
+
+3) Logging On for the First Time
+
+    Ensure you have the ProDOS date set (or a ProDOS compatible clock installed). Boot your system from the /HD1 volume or double-click on the STARTUP program from the Finder. When STARTUP runs, it will prompt you for the date if you don't have a clock, then it will start the BBS. You can use your own hard disk menu program if you prefer.
+
+    When the BBS title page comes up you will see "Awaiting Call Number 1". Log on by entering Open Apple-L. (Hold down the Open Apple key and hit the L key, then let go of both keys). When prompted to enter your ID number, enter 1000 and press Return. After a moment, the system will ask for your password. Until you change it, the password is SYSOP. Passwords are not case sensitive, as the system stores them in upper case and converts password input to upper case before comparing what you typed and what is stored in your user ID. (You will see asterisks as you enter your password.) If you make a mistake, hitting the left arrow or Delete keys will allow you to backspace. Typing Control-X will erase the entire line and let you start again.
+
+    If you are logging on remotely (via modem), you will also be prompted for the remote access code. The code is 'REMOTE' until you change it. (The remote access code is set in the Sys.Data file.)
+
+
+4) Installing "live" modem drivers
+
+    Although the bulk of Warp Six BBS is written in the standard AppleSoft BASIC, BASIC is not flexible enough to support fast I/O (input and output) and protocol file transfers. These tasks are left to assembly language, which is extremely fast. Warp Six BBS requires two binary files called WARP6.LOADER and WARP6.DRIVER to be present in the system's program or "root" directory. (As supplied it is /HD1/WARP6/BBS.)
+
+    To install a live modem driver, first delete the modem-disabled WARP6.LOADER and WARP6.DRIVER from the Warp6 directory, then select the live modem loader and driver that applies to you and copy them to the Warp6 directory. Ensure
+that you then RENAME either or both files so they are called WARP6.LOADER and WARP6.DRIVER. (To copy files, use a ProDOS file utility such as System Utilities, Filer, Cat.Doctor from ProSel, Copy2Plus, or something similar.)
+
+(Reminder: in the Warp6 directory, the WARP6.LOADER and WARP6.DRIVER as supplied are modem-disabled. You can always restore the modem disabled drivers from the original ShrinkIt file that contains the system.)
+
+There are two "live" modem drivers:
+
+GS.DRIVER, the driver for the IIGS modem port
+SSC.DRIVER, for the Apple Super Serial card (or equivalent)
+
+Each driver requires the appropriate loader program:
+
+SSC.LOADER, the loader for the SSC.Driver
+GS.LOADER, the loader for either of the GS drivers
+
+    If you have an Apple Super Serial Card or Applied Engineering DataLink 2400, copy the following files from the DRIVERS directory to the /HD1/WARP6/BBS directory:
+
+SSC.LOADER -> copy and rename as WARP6.LOADER
+SSC.DRIVER -> copy and rename as WARP6.DRIVER
+
+    As noted, the driver you select must be renamed as "WARP6.DRIVER" so the system can find it. If you plan to use a IIGS and external Hayes or compatible modem via the IIGS built in modem port, copy the following files to the /HD1/WARP6/BBS directory:
+
+GS.LOADER -> copy and rename as WARP6.LOADER
+GS.DRIVER -> copy and rename as WARP6.DRIVER
+
+    The GS drivers always use the modem port, and will check your Control Panel settings and advise you if any changes are required. Under "Slots", set slot 2 to "Modem Port". The port's actual settings don't matter and can be left as they are. Your IIGS system speed should be set for "fast" mode for use with the IIGS driver. The driver will insist you shut off AppleTalk, as it causes the modem port to lose data. If you have an accelerator, use it. There should not be any compatibility problems.
+
+Reminder: If you have a DataLink 2400 in your IIGS, use the SSC.DRIVER.
+
+
+Setting the modem's maximum baud rate
+
+    Rather than write five or six different modem drivers, there is only one for each interface. They are both set for a default speed of 2400 baud or "bits per second" (bps). If you are using a normal 2400 baud modem without any form of error control (V.42bis a.k.a. LAPM or MNP) then this is fine. If your modem does have error control and you want to use it, you have to modify these lines in the LOGON program:
+
+50 POKE BA + 47,3: REM 1=300 bps 2=1200 3=2400 4=4800 5=9600 6=19200 7=38400 8=57600
+
+60 POKE BA + 449,255: REM Match bps to incoming calls. 0=Fixed bps
+
+70 POKE BA + 450,255: REM RTS/CTS handshaking on. 0=OFF
+
+    To enable the drivers for high speed modems, you must POKE in a higher default baud rate in line 50 of LOGON. You also have to do a POKE to enable hardware handshaking (line 70) and if you wish, to force the driver to talk to the modem at a fixed baud rate (line 60). It is preferable NOT to use a fixed baud rate to talk to the modem if possible; on the Hayes you add the S36=5 command to the Modem.Init file to accomplish this. As well, in Modem.Init you must enable hardware handshaking on the modem if you wish to use it. (On the Hayes the &K3 command does this.)
+
+    Do a "SAVE LOGON" when you are done. Make sure you select the highest baud rate your modem can support, i.e. the highest DTE speed up to 19200, or higher if you have a IIgs with an accelerator.
+
+    If you are using a Super Serial Card in a slot other than slot 2, add the following line to the LOGON program, changing the number to reflect the slot the interface is in. (Note: you cannot change the slot from slot 2 when using a GS driver -- it is "hard coded" to work only with the modem port, so changing this will have no effect.)
+
+85 POKE SM,7 : REM Sets modem slot to 7
+
+Please refer to "Modem Doc" for precise information on modem and cable requirements.
+
+    Line 1020 in LOGON contains the DIMension statements for two string arrays. The first one, TI$(), is used for data library names and pathnames, and has 10 elements plus the zero element, which isn't used. If you want to have more than 10 transfer data libraries, increase the value in the DIM statement so it will be DOUBLE the number of libraries you will need. If you need 15 libraries, dimension 30. When you run out of space you will get an error trying to enter the transfer section. Here is line 1020 as supplied:
+
+1020 DIM TI$(20): DIM MS$(86)
+
+The second array, MS$(), is used to hold lines entered in the message editor. You should not attempt to change this value.
+
+5) Summary of changes you can make to the LOGON Program
+
+    The following lines in the LOGON program control various aspects of the system. These lines can be edited to suit the system operator; most of them have already been described here. I include the complete list for your reference.
+
+50 POKE BA + 47,3: REM 1=300 bps 2=1200 3=2400 4=4800 5=9600 6=19200 7=38400 8=57600
+60 POKE BA + 449,255: REM Match bps to incoming calls
+70 POKE BA + 450,255: REM RTS/CTS handshaking on. 0=OFF
+1010 AF = 0:BE = 1:CL = 3:LL = 15:TL = 10:VW = 79
+1020 DIM TI$(20): DIM MS$(86)
+
+6) Other enhancements to your system.
+
+    Users can now choose who to send mail to when using the report to sysop command. The file named SYS.LIST contains the names of any co-sysops or users of ANY level who you wish to be included. As shipped, this file contains only the SYSOP. The format of the file is much the same as LIB.DATA for the libraries. This is what SYS.LIST looks like.
+
+1
+SYSOP
+1000
+
+The first line is how many names in the list. Following that are all the names. The last portion are the ID numbers of the users in the list. After adding more names it might look like this...
+
+4
+SYSOP
+John Doe (librarian)
+Jane Doe (new user validations)
+Harry MacGillicuddy (user group contact)
+1000
+1381
+1055
+1212
+
+Warp Six will check how many names there are, display them for the user to choose from, and get the ID number of the user to send the mail to. It will allow a double sized mailbox so there is less chance of a "full mailbox" message when a user uses R)eport to sysop.
+
+    There is a guest account built into Warp Six now. This allows those "one time callers" a way of looking around without using up system resources. It also saves a lot of time validating users who don't plan to call back. To activate the guest account you simply log on as a new user and enter the information as follows:
+
+Alias : GUEST
+Last name : USER
+First Name : GUEST
+
+    The BBS doesn't use anything else till you get to hotkeys. Enter anything you like till you get there. I recommend setting hotkeys OFF for the guest account but it's up to you. The system doesn't use a password for the guest account so enter anything to get past the prompt. Make a note of the ID# the system assigns.
+    Now change the last field in the SYS.DATA file (9999) to the ID number the system gave you. THAT'S IT!      -={ Do not validate this account! }=-
+    Guests will be asked for their name when they logon (reported in the user log), have a 20 minute time limit, and have a permanent 5 new messages in every forum. In all other respects they are a normal unvalidated user.
+
+    There is now built in support for online door games in Warp Six. To enable the door launcher program, read the documentation included here in the DOOR.DOC file. It will explain how to modify WARP6.BBS and how to go about installing the games you want online. We are working on a game pack to compliment Warp Six. It will include most, if not all, of the games that will presently run online. You will need to read the docs that come with each game to fully understand how to install some of them. Games such as Taipan and TriviaMaster have small programs that are designed to run at night to update score files. These are the hardest to install if you want them to run automatically. The games will run without them usually but without scores, what's the point?  <grin>
