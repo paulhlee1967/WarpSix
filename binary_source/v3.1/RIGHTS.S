@@ -1,0 +1,185 @@
+* Copyright message routine
+* To decode, XOR $AB each byte
+
+RIGHTS LDX #0
+:PRINT LDA :MSG,X
+ EOR #$AB
+ BEQ :EXIT
+ JSR COUT
+ INX
+ BNE :PRINT ;always (stringlen < 255 always)
+:EXIT RTS
+
+* 123456789 123456789 123456789 1234567890
+
+* Warp Six BBS PD v3.1a1
+* By Jim Ferr and Scott Johnson.
+* In memory of Frank Kucharski and Jim Low.
+
+
+
+:MSG HEX 2626 ;cr cr
+ HEX 7C4A595B0B7842530B ;Warp Six
+ HEX 6969780B ;BBS
+ HEX 7B6F0B ;PD
+
+ HEX 5D ;v
+ HEX 18051A4A1A ;3.1a1
+ HEX 26 ;cr
+
+ HEX 49520B ;by
+ HEX 6142460B ;Jim
+ HEX 6D4E5959 ;Ferr
+ HEX 0B
+ HEX 4A454F0B ;and
+ HEX 7848445F5F0B ;Scott
+ HEX 6144434558444505 ;Johnson.
+ HEX 2626 ;cr cr
+
+* In memory of Frank Kucharski & Jim Low.
+
+ HEX 62450B ;In
+ HEX 464E464459520B ;memory
+ HEX 444D0B ;of
+
+ HEX 6D594A45400B ;Frank
+ HEX 605E48434A595840420B ;Kucharski
+ HEX 0D0B ;&
+ HEX 6142460B ;Jim
+ HEX 67445C05 ;Low.
+
+
+
+
+
+
+ HEX 2626AB ;cr cr end
+
+* ASCII code 0 = 43 = 2B
+* ASCII code 1 = 42 = 2A
+* ASCII code 2 = 41 = 29
+* ASCII code 3 = 40 = 28
+* ASCII code 4 = 47 = 2F
+* ASCII code 5 = 46 = 2E
+* ASCII code 6 = 45 = 2D
+* ASCII code 7 = 44 = 2C
+* ASCII code 8 = 35 = 23
+* ASCII code 9 = 34 = 22
+* ASCII code 10 = 33 = 21
+* ASCII code 11 = 32 = 20
+* ASCII code 12 = 39 = 27
+* ASCII code 13 = 38 = 26
+* ASCII code 14 = 37 = 25
+* ASCII code 15 = 36 = 24
+* ASCII code 16 = 59 = 3B
+* ASCII code 17 = 58 = 3A
+* ASCII code 18 = 57 = 39
+* ASCII code 19 = 56 = 38
+* ASCII code 20 = 63 = 3F
+* ASCII code 21 = 62 = 3E
+* ASCII code 22 = 61 = 3D
+* ASCII code 23 = 60 = 3C
+* ASCII code 24 = 51 = 33
+* ASCII code 25 = 50 = 32
+* ASCII code 26 = 49 = 31
+* ASCII code 27 = 48 = 30
+* ASCII code 28 = 55 = 37
+* ASCII code 29 = 54 = 36
+* ASCII code 30 = 53 = 35
+* ASCII code 31 = 52 = 34
+* ASCII code 32( ) = 11 = 0B
+* ASCII code 33(!) = 10 = 0A
+* ASCII code 34(") = 9 = 09
+* ASCII code 35(#) = 8 = 08
+* ASCII code 36($) = 15 = 0F
+* ASCII code 37(%) = 14 = 0E
+* ASCII code 38(&) = 13 = 0D
+* ASCII code 39(') = 12 = 0C
+* ASCII code 40(() = 3 = 03
+* ASCII code 41()) = 2 = 02
+* ASCII code 42(*) = 1 = 01
+* ASCII code 43(+) = 0 = 00
+* ASCII code 44(,) = 7 = 07
+* ASCII code 45(-) = 6 = 06
+* ASCII code 46(.) = 5 = 05
+* ASCII code 47(/) = 4 = 04
+* ASCII code 48(0) = 27 = 1B
+* ASCII code 49(1) = 26 = 1A
+* ASCII code 50(2) = 25 = 19
+* ASCII code 51(3) = 24 = 18
+* ASCII code 52(4) = 31 = 1F
+* ASCII code 53(5) = 30 = 1E
+* ASCII code 54(6) = 29 = 1D
+* ASCII code 55(7) = 28 = 1C
+* ASCII code 56(8) = 19 = 13
+* ASCII code 57(9) = 18 = 12
+* ASCII code 58(:) = 17 = 11
+* ASCII code 59(;) = 16 = 10
+* ASCII code 60(<) = 23 = 17
+* ASCII code 61(=) = 22 = 16
+* ASCII code 62(>) = 21 = 15
+* ASCII code 63(?) = 20 = 14
+* ASCII code 64(@) = 107 = 6B
+* ASCII code 65(A) = 106 = 6A
+* ASCII code 66(B) = 105 = 69
+* ASCII code 67(C) = 104 = 68
+* ASCII code 68(D) = 111 = 6F
+* ASCII code 69(E) = 110 = 6E
+* ASCII code 70(F) = 109 = 6D
+* ASCII code 71(G) = 108 = 6C
+* ASCII code 72(H) = 99 = 63
+* ASCII code 73(I) = 98 = 62
+* ASCII code 74(J) = 97 = 61
+* ASCII code 75(K) = 96 = 60
+* ASCII code 76(L) = 103 = 67
+* ASCII code 77(M) = 102 = 66
+* ASCII code 78(N) = 101 = 65
+* ASCII code 79(O) = 100 = 64
+* ASCII code 80(P) = 123 = 7B
+* ASCII code 81(Q) = 122 = 7A
+* ASCII code 82(R) = 121 = 79
+* ASCII code 83(S) = 120 = 78
+* ASCII code 84(T) = 127 = 7F
+* ASCII code 85(U) = 126 = 7E
+* ASCII code 86(V) = 125 = 7D
+* ASCII code 87(W) = 124 = 7C
+* ASCII code 88(X) = 115 = 73
+* ASCII code 89(Y) = 114 = 72
+* ASCII code 90(Z) = 113 = 71
+* ASCII code 91([) = 112 = 70
+* ASCII code 92(\) = 119 = 77
+* ASCII code 93(]) = 118 = 76
+* ASCII code 94(^) = 117 = 75
+* ASCII code 95(_) = 116 = 74
+* ASCII code 96(`) = 75 = 4B
+* ASCII code 97(a) = 74 = 4A
+* ASCII code 98(b) = 73 = 49
+* ASCII code 99(c) = 72 = 48
+* ASCII code 100(d) = 79 = 4F
+* ASCII code 101(e) = 78 = 4E
+* ASCII code 102(f) = 77 = 4D
+* ASCII code 103(g) = 76 = 4C
+* ASCII code 104(h) = 67 = 43
+* ASCII code 105(i) = 66 = 42
+* ASCII code 106(j) = 65 = 41
+* ASCII code 107(k) = 64 = 40
+* ASCII code 108(l) = 71 = 47
+* ASCII code 109(m) = 70 = 46
+* ASCII code 110(n) = 69 = 45
+* ASCII code 111(o) = 68 = 44
+* ASCII code 112(p) = 91 = 5B
+* ASCII code 113(q) = 90 = 5A
+* ASCII code 114(r) = 89 = 59
+* ASCII code 115(s) = 88 = 58
+* ASCII code 116(t) = 95 = 5F
+* ASCII code 117(u) = 94 = 5E
+* ASCII code 118(v) = 93 = 5D
+* ASCII code 119(w) = 92 = 5C
+* ASCII code 120(x) = 83 = 53
+* ASCII code 121(y) = 82 = 52
+* ASCII code 122(z) = 81 = 51
+* ASCII code 123({) = 80 = 50
+* ASCII code 124(|) = 87 = 57
+* ASCII code 125(}) = 86 = 56
+* ASCII code 126(~) = 85 = 55
+* ASCII code 127() = 84 = 54

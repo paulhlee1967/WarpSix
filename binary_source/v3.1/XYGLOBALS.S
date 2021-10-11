@@ -1,0 +1,518 @@
+* XYGlobals
+
+KSTART DFB 0 ;1k supported
+LSTART DFB 0 ;4k supported
+
+PACKNUM DFB 0 ;packet number
+TRYCOUNT DFB 0 ;try count
+ERRCOUNT DFB 0 ;total errors count
+CANCOUNT DFB 0 ;cancel byte count
+ENDFLAG DFB 0 ;end flag
+NOWFLAG DFB 0 ;end now flag
+CHECKSUM DFB 0 ;checksum byte
+
+TIMEOUT DFB $0A ;10 second timeout default
+
+LASTPAK DFB 0 ;packet number of lastpak
+BADCNT DFB 0 ;# of consec. bad paks.
+GOODCNT DFB 0 ;# of consec. good paks.
+
+OURDATE DW $0000
+OURTIME DW $0000
+
+NEOFPARMS DFB $02 ;parm count
+ DFB $00 ;refnum
+EOFSAVE DS 3
+
+ DW $0000
+
+ TR ON
+OURPATH DS 65
+ TR OFF
+
+* Get_Mark parms
+
+GMPARMS DFB $02 ;parm count
+GMREFNUM DFB 0
+PCLOW DFB 0 ;counter for bytes transferred
+PCMID DFB 0
+PCHIGH DFB 0
+
+* Create parms
+
+CPARMS DFB $07 ;parm count
+CPATH DW $0000 ;pathname ptr
+CACCESS DFB $E3 ;access
+CTYPE DFB $04 ;text file type
+CAUXTYP DW $0000 ;Aux type
+ DFB $01 ;storage type
+CDATE DW $0000
+CTIME DW $0000
+
+* Write parms
+
+WPARMS DFB $04 ;parm count
+WREFNUM DFB $00
+WBUFPTR DA FILEBUF
+WREQCNT DW $0000
+WXFERCNT DW $0000
+
+* Destroy parms
+
+DPARMS DFB $01 ;parm count
+DPATH DW $0000 ;pathname ptr
+
+* Code begins here...
+
+* GETEOF. Requires file refnum be stored in
+* at EOFPARMS+1.
+
+ LST ON
+GETEOF LDA #2 ;set up parm list
+ STA EOFPARMS ;parm count
+ LST OFF
+ LDA #0
+ STA EOFPARMS+2 ;low byte
+ STA EOFPARMS+3 ;mid byte
+ STA EOFPARMS+4 ;high byte
+
+ JSR MLI
+ DFB $D1 ;get_eof
+ DA EOFPARMS ;point to location in buffer
+ RTS ;return with any error
+
+* CREATEs a file. Assumes parm list set up.
+
+CREATE JSR MLI ;create file
+ DFB $C0 ;assumes parm list set
+ DA CPARMS
+ RTS
+
+* DESTROY file pointed to by VPATH1
+* Assumes file is closed, and unlocked.
+
+DESTROY LDA VPATH1 ;copy pathname pointer
+ STA DPATH
+ LDA VPATH1+1
+ STA DPATH+1
+ JSR MLI ;destroy the file
+ DFB $C1
+ DA DPARMS
+ RTS
+
+* Figure out the address of the end of our packet buffer
+* so we can stop at that point. Save in STOP & STOP+1.
+* Trashes A.
+
+SETSTOP CLC
+ LDA #<PACKBUF ;get low byte
+ ADC SIZE ;add to SIZE low byte
+ STA STOP ;save result
+
+ LDA #>PACKBUF ;get high byte
+ ADC SIZE+1
+ STA STOP+1 ;save result
+
+:EXIT RTS
+
+* Send 8 CAN chars, 1 EOT and 9 Backspaces
+
+CANCEL LDA #CAN
+ LDY #8
+:LOOP1 JSR MOUTV
+ DEY
+ BNE :LOOP1
+ LDA #EOT
+ JSR MOUTV
+ LDA #BS
+ LDY #9
+:LOOP2 JSR MOUTV
+ DEY
+ BNE :LOOP2
+ RTS
+
+PROMPT
+ JSR PRINT
+ HEX 8D
+ ASC "Ready."
+ HEX 8D00
+ RTS
+
+* CSUMCALC calculate cumulative checksum
+
+CSUMCALC CLC ;always toss carry
+ ADC CHECKSUM ;add data byte
+ STA CHECKSUM ;save.
+ RTS
+
+* PACKZERO write 00 characters to our packet buffer
+* Works with any size packet.
+
+PACKZERO LDA #0
+ STA PKBYTE ;write zeroes
+ JSR PACKCLR ;do it
+ LDA #$1A ;Control-Z
+ STA PKBYTE ;restore default
+ RTS
+
+* Buffers for Xmodem module.
+
+ LST ON
+
+ DS \
+
+FILEBUF EQU *
+GETPARMS EQU *
+ LST OFF
+ TR ON
+PACKBUF DS 18
+EOFPARMS DS 4096-18
+ LST OFF
+ TR OFF
+
+SETMARK EQU *
+GETMARK
+ JSR MLI
+MARK DFB $CF ;get_mark
+ DA GMPARMS
+ RTS  ;currently ignores errors
+
+
+* PACKCLR clear packet buffer with value in PKBYTE
+* Works with any size packet.
+
+PACKCLR LDA #<PACKBUF ;set up pointer
+ STA XPTR
+ LDA #>PACKBUF
+ STA XPTR+1
+ JSR SETSTOP ;set up STOP location
+
+* Loop below does all data bytes in the packet
+
+CLR LDY #0 ;no offset
+ DFB $A9 ;LDA immediate
+
+PKBYTE DFB $1A ;Control-Z
+
+ STA (XPTR),Y ;write to buffer
+
+ INC XPTR ;always inc low byte
+ LDA XPTR ;check if low byte 0
+ BNE :CHECK ;if non zero, continue
+ INC XPTR+1 ;if zero, inc high byte
+
+:CHECK LDA STOP ;low byte of packbuf
+ CMP XPTR
+ BNE CLR
+
+ LDA STOP+1 ;load high byte
+ CMP XPTR+1
+ BNE CLR
+
+:END RTS  ;we're done!
+
+
+* Get a byte with timeout
+
+GETBYTE PHY  ;save Y
+ PHX  ;save X
+
+ LDA TIMEOUT ;copy timeout value
+ STA SECONDS
+ LDA #60
+ STA STICS
+
+:READ JSR MBUFCKV
+ BEQ :NODATA
+ JSR MBUFINV ;character in A
+
+:EXIT PLX  ;pull X
+ PLY  ;pull Y
+ CLC
+ RTS
+
+:NODATA JSR CHKVBL
+ LDA SECONDS
+ BNE :READ
+
+:TIME PLX  ;pull X
+ PLY  ;pull Y
+ SEC  ;timed out
+ RTS
+
+* Set up bytes transferred display
+
+DISPLAY0 PHP ;save status
+
+ STA :SAVEA ;save all registers
+ STY :SAVEY
+ STX :SAVEX
+
+ LDX REMFLG
+ STX :SAVER
+ LDX #0
+ STX REMFLG ;output to screen only
+
+ JSR PRINT ;use our own print rtn
+ HEX 8D
+ ASC "Bytes:         0 "
+ ASC "     Retries:   0"
+ HEX 00
+
+ LDA :SAVER
+ STA REMFLG
+ LDA :SAVEA ;restore registers
+ LDY :SAVEY
+ LDX :SAVEX
+ PLP ;get saved status
+ RTS
+:SAVEA HEX 00
+:SAVEY HEX 00
+:SAVEX HEX 00
+:SAVER HEX 00
+
+* Update bytes transferred display on screen.
+
+DISPLAY PHP ;save status
+
+ STA :SAVEA ;save registers
+ STY :SAVEY
+ STX :SAVEX
+
+ LDX REMFLG ;save REMFLG
+ STX :SAVER
+ LDX #0
+ STX REMFLG ;output to screen only
+
+* Position cursor
+
+ LDY #8
+ JSR SETH
+
+* now print bytes transferred in decimal
+
+ LDA #" "
+ LDX #7
+:SPACED STA LENBUF,X ;fill buffer with spaces
+ DEX
+ BNE :SPACED
+ LDA PCHIGH
+ STA ACCH ;save high byte
+ LDX PCMID ;medium byte in X
+ LDA PCLOW ;low byte in A
+ LDY #7 ;# of chars to print -1
+ JSR HEXDEC
+ JSR PRINTL ;print length
+
+ LDY #30
+ JSR SETH
+ LDA #" "
+ STA LENBUF
+ STA LENBUF+1
+ STA LENBUF+2
+
+ LDA #0
+ STA ACCH ;save high byte
+ LDX #0 ;medium byte in X
+ LDA ERRCOUNT ;low byte in A
+ LDY #2 ;# of chars to print -1
+ JSR HEXDEC
+
+ LDA #0
+ STA LENBUF+3
+ LDA #$80 ;BRA instruction
+ STA LENBUF+4
+ LDA #3 ;skip over 4 bytes
+ STA LENBUF+5
+ JSR PRINTL ;print length
+
+ LDA :SAVER ;restore everything
+ STA REMFLG
+ LDA :SAVEA
+ LDY :SAVEY
+ LDX :SAVEX
+ PLP ;get saved status
+ RTS
+
+:SAVEA HEX 00
+:SAVEY HEX 00
+:SAVEX HEX 00
+:SAVER HEX 00
+
+
+** Print CR on local display only
+
+DISPLAYX PHP ;save status
+
+ STA :SAVEA ;save registers
+
+ LDX REMFLG ;save REMFLG
+ STX :SAVER
+ LDX #0
+ STX REMFLG ;output to screen only
+
+ LDA #$8D
+ JSR COUT
+
+ LDA :SAVER ;restore everything
+ STA REMFLG
+ LDA :SAVEA
+ PLP ;get saved status
+ RTS
+
+:SAVEA HEX 00
+:SAVER HEX 00
+
+* Convert standard ASCII char to lowercase
+* (Used for Ymodem pathnames)
+
+DNSHIFT CMP #'A'
+ BLT :NO
+ CMP #'Z'+1
+ BGE :NO
+ ORA #%00100000 convert to lowercase
+:NO RTS
+
+* Ymodem filenames stored here...
+
+ TR ON
+YPATHS DS 255
+ TR OFF
+
+SETH STY OURCH
+ RTS
+
+MACBINARY DFB 0
+FIRST DFB 0
+
+* GET_INFO on the file
+
+GETINFO LDA VPATH1 ;pathname pointer
+ STA GETPARMS+1
+ LDA VPATH1+1
+ STA GETPARMS+2
+
+GETINFO1 LDA #$0A ;parm count
+ STA GETPARMS
+ LDY #3
+ LDA #0
+:LOOP STA GETPARMS,Y ;zero the parm table
+ INY
+ CPY #$12
+ BLT :LOOP
+
+ JSR MLI
+ DFB $C4 ;GET_FILE_INFO
+ DA GETPARMS ;point to packet buffer
+ RTS
+
+
+
+* Routine to print 3 byte file length in decimal
+* After it has already been converted and sits in LENBUF
+
+PRINTL JSR PRINT
+ ASC " " ;print a space
+
+*              1 6 7 7 7 2 1 5   -- maximum eof
+*                                in decimal.
+
+LENBUF HEX A0A0A0A0A0A0A0A0 ;bytes
+ HEX 00 ;zero byte marks end
+ RTS
+
+
+* Routine to convert three byte value to decimal
+* High byte in ACCH
+* Medium byte in X
+* Low byte in A
+* Number of chars -1 in Y
+
+* Leaves result in LENBUF, with leading spaces
+* if necessary.
+
+HEXDEC
+ STX ACCM
+ STA ACCL
+HEXDEC1 JSR DIVID10 ;/ by 10 & convert to modulo to ASCII
+ LDA MOD
+ ORA #$B0 ;make it ASCII 0-9
+ STA LENBUF,Y ;from right to left
+ DEY
+ LDA ACCL
+ ORA ACCM ;test for zero
+ ORA ACCH
+ BNE HEXDEC1 ;always
+HEXDEC2 RTS
+
+DIVID10 LDX #$18 ;for 24 bits
+ LDA #0 ;zero out modulo
+ STA MOD
+DIV1 JSR SHFT24
+ ROL MOD
+ SEC
+ LDA MOD
+ SBC #$A
+ BCC DIV2
+ STA MOD
+ INC ACCL
+DIV2 DEX ;more bits?
+ BNE DIV1
+ RTS
+SHFT24 ASL ACCL
+ ROL ACCM
+ ROL ACCH
+ RTS
+
+*    Print decimal routine
+*
+* Enter routine with number in
+* A,X (hi,low). JUST must hold
+* $A0 for right justification
+* or anything positive for
+* left justification.
+*
+* From Merlin Pro.
+
+PRDEC STA NH
+ STX NL
+ LDX #9
+ STX NFL
+LOAD0 LDY #"0"
+DIV LDA NL
+ CMP NUMTBL-1,X
+ LDA NH
+ SBC NUMTBL,X
+ BCC DIVD
+ STA NH
+ LDA NL
+ SBC NUMTBL-1,X
+ STA NL
+ INY
+ BNE DIV
+DIVD TYA
+ DEX
+ BEQ PRD
+ CMP #"0"
+ BEQ PDIG
+ STA NFL
+PDIG BIT NFL
+ BMI PRD
+ LDA JUST
+ BPL NXDIG
+PRD JSR COUT ;print
+NXDIG DEX
+ BPL LOAD0
+ RTS
+
+NUMTBL DW 1,10,100,1000,10000
+
+NH HEX 00
+NL HEX 00
+NFL HEX 00
+JUST HEX 00
+
+ACCL DFB 0
+ACCM DFB 0
+ACCH DFB 0
+MOD DFB 0

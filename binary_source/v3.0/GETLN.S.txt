@@ -1,0 +1,170 @@
+* Get a line of input from user and return it
+* to AppleSoft BASIC. Also handles loss of carrier
+* and sysop commands.
+*
+* Includes idle timeout that disconnects user
+* if inactive beyond the sysop-set timeout.
+
+GETLN    BIT   WWACTV     Any data in wordwrap buf?
+         BPL   :CURSOR
+         JSR   WWPRNT     Print wordwrap buffer.
+:CURSOR  JSR   SHOWCUR    put cursor on local screen
+
+:TIME0   LDA   TIMEOUT
+         STA   MINUTES
+         LDA   #60
+         STA   SSECONDS
+         STA   STICS
+         STZ   :WARNFLG
+
+:GET     LDA   RCODE
+         BNE   :ALLOUT
+         LDA   KEYBD      key down?
+         BPL   :MODEM
+         BIT   OAKEY      command?
+         BMI   :KEYCMD
+
+* keyboard always active
+
+         STA   STROBE     clear for next time
+:CHAR    JSR   FILTER
+         BCS   :TIME      handle as if no input
+         JSR   TOBASIC
+         BNE   GETLN      not finished
+
+:ALLOUT  JSR   UPDATE     done
+         CLC
+         RTS
+
+:MODEM   BIT   REMFLG
+         BPL   :TIME
+
+         LDY   DCDSTATE
+         BNE   :NODCD
+
+         JSR   MBUFCHK
+         BEQ   :TIME
+         JSR   MBUFIN
+         BRA   :CHAR
+
+:TIME    BIT   CHATFLG    ignore timeout in chat
+         BMI   :GET
+
+         JSR   CHKVBL     check vertical blanking
+         LDA   MINUTES    any time left?
+         BEQ   :NOTIME
+
+         CMP   #1         1 minute or less?
+         BNE   :GET       if not, all is well.
+
+         BIT   :WARNFLG   did we warn already?
+         BMI   :GET       if so, continue.
+
+         LDA   SSECONDS
+         CMP   #30+1      more than 30 seconds left?
+         BGE   :GET       if so, continue.
+
+         JSR   WARN       warn user
+         LDA   #$FF       set flag so we know we did
+         STA   :WARNFLG
+         BRA   :GET       and continue.
+
+:NOTIME  JMP   TIMESUP
+
+:NODCD   JSR   DCDLOST
+         BRA   :ALLOUT
+
+:WARNFLG DS    1
+
+* Process keyboard command
+* (Open Apple was pressed down on a keypress)
+
+:KEYCMD  STA   STROBE
+         JSR   UPSHIFT
+
+* CMP #"L" logoff?
+* BEQ :LOGOFF
+
+         CMP   #"C"       chat?
+         BEQ   :CHAT
+
+         CMP   #"K"       kill?
+         BEQ   :KILL
+:NOCMD   JMP   :GET
+
+*:LOGOFF BIT LOCALFLG
+* BPL :GOGET local keyboard must be on
+* JSR CLRCUR
+* LDA #3 logoff code
+* STA RCODE
+* JSR DCD2
+*:GOGET JMP :GET
+
+:KILL    JSR   CLRCUR
+         LDA   #4         kill call return code
+         STA   RCODE
+         JSR   DCD2
+         BRA   :NOCMD
+
+:OLDCASE DFB   $0         save area for ucaseflg
+
+:CHAT    BIT   CHATFLG    ;chat active?
+         BPL   :SYSON     ;no
+         STZ   LOCALFLG   ;shut off local keybd
+         STZ   CHATFLG    ;turn off chat flag
+         LDA   :OLDCASE   ;load caseflg we saved
+         STA   UCASEFLG   ;restore flag
+         LDA   :HOTSAVE   ;load hotflg we saved
+         STA   HOTFLG     ;restore flag
+         LDA   :ENTSAVE
+         STA   ENTFLG
+         LDA   :MODESAVE
+         STA   MODEFLG
+         LDA   :VIDSAVE
+         STA   VIDW
+         STZ   NUMCHAR
+         STZ   WWCHAR
+         STZ   WWACTV
+         JSR   CLRCUR
+         JSR   PRINT      ;print off message
+         HEX   8D8D
+         ASC   "Chat end : ",00
+:GOLN    JMP   GETLN
+:GONOCMD JMP   :NOCMD
+
+:SYSON   BIT   REMFLG     ;is there a remote user?
+         BPL   :NOCMD     ;if no, command illegal
+
+         STZ   OURCH
+         JSR   CLREOL
+
+         LDA   HOTFLG     ;save hot key flag
+         STA   :HOTSAVE
+         LDA   UCASEFLG   ;save case flag
+         STA   :OLDCASE
+         LDA   ENTFLG     ;save message entry flag
+         STA   :ENTSAVE
+         LDA   MODEFLG    ;save mode flag
+         STA   :MODESAVE
+         LDA   VIDW       ;save video width
+         STA   :VIDSAVE
+         LDA   #77        ;set word wrap to 77 chars.
+         STA   VIDW
+         STZ   UCASEFLG   ;set for full case
+         STZ   HOTFLG     ;kill hot keys
+         STZ   NUMCHAR    ;zero line buffer
+         STZ   WWCHAR     ;zero word wrap char
+         STZ   WWACTV     ;zero flag for chars to wrap
+         STZ   MODEFLG    ;shut off hidden mode
+         LDA   #$FF
+         STA   LOCALFLG   ;enable local keybd
+         STA   ENTFLG     ;enable word wrap
+         STA   CHATFLG    ;turn on chat flag
+         JSR   PRINT
+         HEX   8D8D
+         ASC   "Chat :",8D8D8700
+         BRA   :GOLN
+:HOTSAVE DS    1
+:ENTSAVE DS    1
+:VIDSAVE DS    1
+:MODESAVE DS   1

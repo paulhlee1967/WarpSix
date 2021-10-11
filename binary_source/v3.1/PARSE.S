@@ -1,0 +1,279 @@
+* Parse routine for external commands: TYPE,
+* XCAT, SEND & RECV.
+
+PARSE LDA VPATH1 ;pointer to command buf
+ STA :PARSPTR+1 ;save it
+ STA :PARSPTR1+1
+ STA :PARSPTR2+1
+ STA :PARSPTR3+1
+ STA :PARSPTR4+1
+ LDA VPATH1+1
+ STA :PARSPTR+2
+ STA :PARSPTR1+2
+ STA :PARSPTR2+2
+ STA :PARSPTR3+2
+ STA :PARSPTR4+2
+
+ LDX #4
+:PARSPTR LDA $FFFF,X
+ CMP :OURCMD-1,X ;TYPE?
+ BEQ :FOUND
+ BNE :XCAT
+
+:FOUND DEX
+ BNE :PARSPTR
+ LDA #<TYPE
+ STA XTRNADDR
+ LDA #>TYPE
+ STA XTRNADDR+1
+
+ STZ XCNUM ;tell BI ext.cmd active
+ LDA #4-1 ;length of cmd-1
+ STA XLEN
+
+ LDA #%00000001 ;first filename expected
+ STA PBITS
+ STZ PBITS+1
+
+ CLC  ;claim command
+ RTS  ;return to BI.
+
+* First external command
+
+:XCAT LDX #4
+
+:PARSPTR1 LDA $FFFF,X
+ CMP :OURCMD1-1,X ;XCAT?
+ BEQ :FOUND1
+ BNE :SEND
+
+:FOUND1 DEX
+ BNE :PARSPTR1
+
+ LDA #<XCATV
+ STA XTRNADDR
+ LDA #>XCATV
+ STA XTRNADDR+1
+ LDA #1
+ STA :CMDCODE
+ JMP :RESERVE
+
+* Second external command
+
+:SEND LDX #4
+:PARSPTR2 LDA $FFFF,X
+ CMP :OURCMD2-1,X ;SEND?
+ BEQ :FOUND2
+ BNE :RECV
+
+:FOUND2 DEX
+ BNE :PARSPTR2
+
+ LDA #<SENDV
+ STA XTRNADDR
+ LDA #>SENDV
+ STA XTRNADDR+1
+
+ LDA #2
+ STA :CMDCODE
+ BRA :RESERVE
+
+* Not our command
+
+:NOT SEC  not ours
+ JMP OLDEXV jump to old xtrn vector
+
+* Third external command
+
+:RECV LDX #4
+:PARSPTR3 LDA $FFFF,X
+ CMP :OURCMD3-1,X ;RECV?
+ BEQ :FOUND3
+ BNE :COPY
+
+:FOUND3 DEX
+ BNE :PARSPTR3
+
+ LDA #<RECVV
+ STA XTRNADDR
+ LDA #>RECVV
+ STA XTRNADDR+1
+
+ LDA #3
+ STA :CMDCODE
+ BRA :RESERVE
+
+* Fourth external command
+
+:COPY LDX #4
+:PARSPTR4 LDA $FFFF,X
+ CMP :OURCMD4-1,X ;COPYV?
+ BEQ :FOUND4
+ BNE :NOT
+
+:FOUND4 DEX
+ BNE :PARSPTR4
+
+ LDA #<COPYV
+ STA XTRNADDR
+ LDA #>COPYV
+ STA XTRNADDR+1
+
+ STZ XCNUM
+ LDA #4-1
+ STA XLEN
+
+ LDA #3
+ STA PBITS ;two filenames expected
+ STZ PBITS+1 ;slot and drive not allowed
+
+ CLC  ;claim the command
+ RTS  ;return to the BI
+
+:OURCMD ASC 'TYPE' ;built-in
+:OURCMD1 ASC 'XCAT' ;cmd 1 auto-load, execute, unload
+:OURCMD2 ASC 'SEND' ;cmd 2      "        "        "
+:OURCMD3 ASC 'RECV' ;cmd 3      "        "        "
+:OURCMD4 ASC 'COPY' ;cmd 4 (externally loaded)
+
+:ERROR
+ JMP ERROUT
+
+:CMDCODE DS 1
+:TEMP DS 1
+
+:XPAGES
+ LST ON
+ DFB BEGIN-$300-$400-XCATV/$100
+ DFB BEGIN-$300-$400-SENDV/$100
+ DFB BEGIN-$300-$400-RECVV/$100
+ LST RTN
+
+* Reserve required memory for external command
+
+:RESERVE
+ LDA BHIMEM ;get boot value of HIMEM
+ STA BHSAVE ;save it
+ LDA MEMSIZ+1 ;get current HIMEM
+ STA :TEMP ;save it
+
+ LDX :CMDCODE ;index into table
+ LDA :XPAGES-1,X ;# of pages for this cmd
+ JSR GETBUFR
+ BNE :ERROR
+
+ LDA :TEMP ;get saved HIMEM before call
+ STA BHIMEM ;pretend it is boot HIMEM
+
+* Get new Himem
+
+ LDA MEMSIZ+1 ;new himem
+ CLC
+ ADC #$4 ;add 4 to it for some reason
+ STA :RBUFPTR+1 ;is destination of our cmd
+
+* Copy command name
+
+ LDA :CMDCODE
+ ASL  ;multiply by 4
+ ASL
+ TAX  ;index in X
+ LDY #0
+:PUSH LDA :OURCMD,X
+ STA PATH1+6,Y
+ INX
+ INY
+ CPY #4
+ BLT :PUSH
+
+* Load command into memory
+
+:LOAD JSR :OPEN
+ BNE :MLIERR
+
+ LDA :OREFNUM
+ STA :RREFNUM
+ STA :CLREFNUM
+
+ JSR :READ
+ BEQ :EXIT9
+ CMP #$4C
+ BEQ :EXIT9
+ BRA :MLIERR
+
+:EXIT9 JSR :CLOSE
+
+ STZ XCNUM tell BI ext.cmd active
+ LDA #4-1 length of cmd-1
+ STA XLEN
+
+* Set PBITS after BLOAD mangles their values
+* Same values here for both SEND and RECV.
+
+ LDA :CMDCODE
+ CMP #1 ;XCAT?
+ BNE :OTHER
+
+ STZ PBITS ;no paramters
+ STZ PBITS+1
+ CLC
+ RTS
+
+:OTHER   ;parms for SEND/RECV
+
+ LDA #%00000001 ;first filename expected.
+ STA PBITS
+ STZ PBITS+1
+
+ CLC
+ RTS
+
+**** Subroutines ****
+
+:MLIERR PHA
+ JSR UNLOAD
+ PLA
+ JSR BADCALL
+ JMP ERROUT
+
+:OPEN JSR MLI
+ DFB $C8
+ DA :OPARMS ;use our own parm list
+ RTS
+
+:READ JSR MLI
+ DFB $CA
+ DA :RPARMS
+ RTS
+
+:CLOSE JSR MLI
+ DFB $CC ;close
+ DA :CLPARMS ;use our parm list
+ RTS
+
+**** Parameter lists ****
+
+* Open parm list
+
+:OPARMS DFB 3 ;parm count
+:OPATH DA PATH1 ;pathname ptr
+ DA IOBUF ;file i/o buffer ptr
+:OREFNUM DS 1
+
+* Read parm list
+
+:RPARMS DFB 4 ;parm count
+:RREFNUM DS 1 ;refnum for our file
+:RBUFPTR DA SENDV ;bufr ptr
+:RREQCNT DFB $FF ;byte request count
+ DFB $FF ;high byte
+:RXFRCNT DW $0000 ;xfer count
+
+* Close parm list
+
+:CLPARMS DFB $01 ;parm count
+:CLREFNUM DFB $00 ;if zero, close all files.
+
+* Pathnames
+
+PATH1 STR '/RAM/XCMD'

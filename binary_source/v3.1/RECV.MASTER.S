@@ -1,0 +1,13 @@
+* RECV master
+
+ DSK /HD1/DRIVERS/RECV
+
+ PUT XEQU
+
+ JSR RECV
+ JMP UNLOAD
+
+ PUT XYGLOBALS
+ PUT RECV ;XModem receive
+ PUT CRC ;CRC calc routines
+ PUT END2

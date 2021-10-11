@@ -1,0 +1,13 @@
+* SEND master
+
+ DSK /HD1/DRIVERS/SEND
+
+ PUT XEQU
+
+ JSR SEND
+ JMP UNLOAD
+
+ PUT XYGLOBALS
+ PUT SEND ;XModem receive
+ PUT CRC ;CRC calc routines
+ PUT END2
