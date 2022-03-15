@@ -1,8 +1,0 @@
-*-Sysop utilities module                 ^-Show detail log
-!-Delete detail log                      #-Show error log
-%-Delete error log                       _-Show FOR.SYSOP messages
-$-Delete last few callers log            >-User Purge utility
-- Delete FOR SYSOP messages              / generate new vote
-= compile vote results to RESULTS file
-X)fer downloads list (display)           Z)ap downloads list (delete)
-
