@@ -1,0 +1,22 @@
+**************************************************
+*                                                *
+*               Warp 6  BBS Logon                *
+*                                                *
+*                  Version 4.0                   *
+*                                                *
+**************************************************
+
+* Copyright 2022 By Scott Johnson & Paul Lee
+
+* Save time user logged on at
+
+----------------------------------
+  DATE
+----------------------------------
+
+LOGON JSR GETTIME
+ LDA TIME+1 hour
+ STA STARTHR save logon time
+ LDA TIME minutes
+ STA STARTMIN
+:EXIT RTS  and exit.

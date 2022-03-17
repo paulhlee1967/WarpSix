@@ -1,0 +1,31 @@
+**************************************************
+*                                                *
+*          Warp 6 BBS Warning Messages           *
+*                                                *
+*                  Version 4.0                   *
+*                                                *
+**************************************************
+
+* Copyright 2022 By Scott Johnson & Paul Lee
+
+----------------------------------
+ DATE
+----------------------------------
+
+WARN JSR PRINT
+ HEX 8D8D
+ ASC "Hello? : ",8700
+ BIT LOCALFLG
+ BPL :DONE
+ JSR BELL
+:DONE JMP SHOWCUR
+
+TIMESUP JSR CLRCUR
+ JSR PRINT
+ HEX 8D8D
+ ASC "Goodbye.",8D00
+ JSR RIGHTS
+ JSR HANGUP
+ LDY #1 return time out code
+ STY RCODE
+ JMP DCD3

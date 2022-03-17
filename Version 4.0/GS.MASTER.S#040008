@@ -1,0 +1,52 @@
+**************************************************
+*                                                *
+*             Warp 6 BBS  GS.Master              *
+*                                                *
+*                  Version 4.0                   *
+*                                                *
+**************************************************
+
+* Copyright 2022 By Scott Johnson & Paul Lee
+
+* Instructions: assemble this file as is.
+*
+* You can change the pathname used to SAVe the object
+* code to whatever you desire.
+
+----------------------------------
+  DATE
+----------------------------------
+
+ LST OFF
+
+BEGIN = $8C00 ;we need up to $99FF
+
+ XC ON
+
+NOIRQ = 0 ;always
+GS = 1 ;always
+W6 = 1
+
+ PUT EQU ;equates
+ PUT MAIN ;vectors
+
+ PUT GETLN ;line input routine
+ PUT FILTER ;input filter
+ PUT OUTPUT ;output routine
+ PUT TOBASIC ;pass data to BASIC
+ PUT WRAP ;word wrap routines
+ PUT CURSOR ;cursor routines
+ PUT SHIFT ;case shift routines
+ PUT PARSE ;parse BI cmd
+
+ PUT TYPE ;TYPE command
+ PUT WARNINGS ;warning msgs
+ PUT LOGON ;logon routine
+ PUT RIGHTS ;copyright routine
+
+ PUT GS.RTNS
+
+ PUT END ;make sure we didn't run
+ ;out of memory
+
+ SAV GS.DRIVER

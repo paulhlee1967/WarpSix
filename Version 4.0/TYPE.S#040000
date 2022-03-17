@@ -1,0 +1,187 @@
+**************************************************
+*                                                *
+*                Warp 6 BBS  TYPE                *
+*                                                *
+*                  Version 4.0                   *
+*                                                *
+**************************************************
+
+* Copyright 2022 By Scott Johnson & Paul Lee
+
+* TYPE: Dump file to current output, with Xon/Xoff
+* protocol, space to abort (if FILESTOP off), SPACE will
+* set SPLABORT flag, RETURN will set NXTFLG.
+* Calls: CLRMBUF, SETTMOUT, DECTMOUT, COUT, MBUFCHK,
+* MBUFIN, DCDLOST, MLI (Open, read, close).
+* Clobbers all registers.
+
+----------------------------------
+ DATE
+----------------------------------
+
+TYPE JSR CLRMBUF kill any random data
+ STZ SPLABORT
+ STZ NXTFLG
+
+ LDA VPATH1 ;set pointer to filename
+ STA OPATH
+ LDA VPATH1+1
+ STA OPATH+1
+
+ JSR OPEN
+ BEQ :NEXT
+ JMP :ERR2
+
+:NEXT LDA OREFNUM get refnum
+ STA RREFNUM save for read
+ STA CLREFNUM save for close
+
+ LDA #<CBUF
+ STA RBUFPTR
+ LDA #>CBUF
+ STA RBUFPTR+1
+ LDA #1 one byte at a time
+ STA RREQCNT
+ STZ RREQCNT+1
+ STZ LASTCH
+
+:READ JSR MLI
+ DFB #$CA
+ DA RPARMS
+ BNE :CLOSE2
+
+ LDA RCODE carrier ok?
+ BNE :ABORT if not, abort.
+
+ LDA CBUF get current byte
+ ORA #%10000000 set high bit
+
+ CMP #$8D ;cr?
+ BNE :PRINT
+
+* Here is a CR character
+
+ LDY LASTCH ;get last cursor pos'n
+ CPY #79
+ BEQ :NOPRINT
+
+:PRINT
+ LDY OURCH save last OURCH
+ STY LASTCH
+ JSR COUT otherwise, print to current output
+
+:NOPRINT LDA KEYBD keybd input?
+ BPL :MODEM no input, check modem
+ STA STROBE clear keybd for next time
+
+:CHECKS CMP #$8D CR?
+ BNE :XOFFCHK
+ LDY FILESTOP allowed to abort?
+ BNE :XOFFCHK no, can't goto next
+ LDA #$FF
+ STA NXTFLG set next bulletin flag
+ BNE :ABORT always abort for next
+:XOFFCHK CMP #$93 control-S?
+ BEQ :GOXONWAIT
+ BNE :ABTCHK
+:ABTCHK CMP #$A0 space? (only from modem)
+ BNE :READ no other input valid
+ LDY FILESTOP user allowed to abort?
+ BNE :READ no.
+ LDA #$FF
+ STA SPLABORT abort spool as well as
+ JMP :ABORT abort file read.
+
+:GOREAD JMP :READ and continue file read
+
+:ERR2 JSR BADCALL
+:ERR2A JMP ERROUT let BI handle unexpected error
+
+:MODEM LDY REMFLG modem active?
+ BEQ :READ
+
+ JSR MBUFCHK any input from modem?
+ BEQ :READ no data
+
+ JSR MBUFIN get char and check
+ ORA #%10000000
+ JMP :CHECKS
+
+:ABORT JSR CROUT print 2 CR's and fall through
+ JSR CROUT
+
+:END LDA #0 flag no error
+
+:CLOSE2 PHA  ;save error code if any
+ JSR CLOSE
+ PLA  ;recover err code
+ BEQ :OK
+ CMP #$4C end of file encountered?
+ BNE :ERR2 no, real error
+
+:OK
+
+* Addition to TYPE command for PSE and ANSI emulation
+
+ LDA PSEFLAG
+ BEQ :OK2 no emulation
+
+ CMP #255
+ BNE :ANSI
+ LDA #$8E Control-N
+ JSR MOUT dump to modem
+ BRA :OK2
+
+:ANSI JSR MPRINT
+ HEX 1B
+ ASC '[0m',00
+
+* end of addition
+
+:OK2 CLC  inform BI all is well
+ RTS  return to BI.
+
+:GOXONWAIT LDA XTMOUT
+ STA SECONDS
+ LDA #60
+ STA STICS
+
+:XONWAIT JSR CHKVBL
+ LDA SECONDS
+ BEQ :GOREAD timed out, continue output.
+
+ LDA KEYBD keybd has priority
+ BPL :MOD
+ STA STROBE
+ CMP #$91 XON from keybd?
+ BEQ :GOREAD
+ CMP #$8D CR from keybd?
+ BEQ :GOREAD
+ CMP #$A0
+ BNE :MOD
+:GOREAD2 JMP :READ
+
+:MOD BIT REMFLG
+ BPL :XONWAIT
+
+ LDY DCDSTATE carrier present?
+ BNE :DCDLOST
+
+ JSR MBUFCHK any modem input?
+ BEQ :XONWAIT if not, loop.
+
+ JSR MBUFIN get character
+ ORA #%10000000 set high bit
+ CMP #$91 XON? (Control-Q)
+ BEQ :GOREAD2 yes, continue with output
+ CMP #$8D CR? (substitute XON)
+ BEQ :GOREAD2 yes, continue with output
+ CMP #$A0 space?
+ BNE :XONWAIT invalid input, keep waiting
+ JMP :READ
+
+:DCDLOST JSR DCDLOST
+ JMP :END
+
+CBUF DS 1 char bufr for read
+LASTCH DS 1

@@ -1,0 +1,21 @@
+**************************************************
+*                                                *
+*               Warp 6 BBS END2.S                *
+*                                                *
+*                  Version 4.0                   *
+*                                                *
+**************************************************
+
+* Copyright 2022 By Scott Johnson & Paul Lee
+
+----------------------------------
+  DATE
+----------------------------------
+
+* Make sure external doesn't overwrite driver area
+
+ LST ON
+   ;up to $84FF only
+END2 EQU *-1
+ LST OFF
+ ERR *-1/$8500 ;force error if out of memory
