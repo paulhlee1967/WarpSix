@@ -1,0 +1,121 @@
+ LST OFF
+
+* XYmodem Globals
+
+W6 = 1
+
+BEGIN = $8C00 ;we need up to $99FF
+ ORG BEGIN-$2000-$300-$400
+
+ XC ON
+
+* Firmware Addresses
+
+CROUT = $FD8E
+COUT = $FDED
+CLREOL = $FC9C
+PRBYTE = $FDDA
+KEYBD = $C000
+STROBE = $C010
+OURCH = $57B
+
+* ProDOS & Basic.System
+
+MLI = $BF00
+DATE = $BF90
+TIME = $BF92
+ERROUT = $BE09 ;BI err handler
+BADCALL = $BE8B ;convert BI err to Aplsoft #
+FREBUFR = $BEF8
+VPATH1 = $BE6C
+
+VARTAB = $69
+
+* Xmodem equates
+
+SOH = $01
+ACK = $06
+NAK = $15
+CAN = $18
+EOT = $04
+BS = $08
+C = 'C' ;for crc option
+K = 'K' ;for 1K option
+L = 'L' ;for 4K option
+G = 'G' ;for Ymodem-G option
+   ;(Ymodem-G not supported)
+STX = $02 ;for 1K block
+SSTX = $82 ;for 4K block
+
+* ProDOS Xmodem equates
+
+SSOH = SOH+%10000000
+SYN = $16
+ETB = $17
+
+* Zero page locations used
+
+XPTR = $FA ;$FA & $FB
+PRTADR = $FE ;$FE & $FF
+CRC = $19 ;$19 & $1A
+STOP = $1B ;$1B & $1C
+SIZE = $1D ;$1D & $1E
+
+* Main module dependencies
+* Must be updated if MAIN.s is changed.
+
+ LST ON
+ DAT
+
+LINBUF = BEGIN-$200
+
+DCDSTATE = BEGIN+$09
+MOUTV = BEGIN+$0E
+MBUFCKV = BEGIN+$11
+MBUFINV = BEGIN+$14
+CLEARV = BEGIN+$2C
+REMFLG = BEGIN+$34
+LEVEL = BEGIN+$36
+
+STICS = BEGIN+$4E
+SECONDS = BEGIN+$4F
+
+OPATH = BEGIN+$59
+OREFNUM = BEGIN+$5D
+CLPARMS = BEGIN+$5E
+CLREFNUM = BEGIN+$5F
+RPARMS = BEGIN+$60
+RREFNUM = BEGIN+$61
+RBUFPTR = BEGIN+$62
+RREQCNT = BEGIN+$64
+RXFRCNT = BEGIN+$66
+
+OPEN = BEGIN+$68
+CLOSE = BEGIN+$6F
+GETTIME = BEGIN+$76
+DELAYV = BEGIN+$89
+DELAYSECS = BEGIN+$94
+
+CHKVBL = BEGIN+$A5
+
+PRINT = BEGIN+$DB
+DCD3 = BEGIN+$164
+CURSORV = BEGIN+$16C
+
+FIXNAME = BEGIN+$170
+YCOUNT = BEGIN+$171
+YTOTAL = BEGIN+$172
+
+XERROR = BEGIN+$173
+PFLAG = BEGIN+$174
+TRYPRO = BEGIN+$175
+CRCFLAG = BEGIN+$176
+KFLAG = BEGIN+$177
+LFLAG = BEGIN+$178
+BINARY2 = BEGIN+$179
+YFLAG = BEGIN+$17A
+MLIERR = BEGIN+$17B
+
+UNLOAD = BEGIN+$1DB
+
+ LST OFF

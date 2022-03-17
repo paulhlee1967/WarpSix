@@ -1,0 +1,21 @@
+SHOWCUR PHA
+ LDA #"_" ;get cursor
+ JSR C3COUT1 ;print it
+ LDA #$88 ;print backspace
+ JSR C3COUT1
+:EXIT PLA
+ RTS
+
+CLRCUR LDA #$A0 erase cursor
+ JSR C3COUT1
+ LDA #$88
+ JMP C3COUT1
+
+PRBFB JSR CLRCUR
+
+ LDA #$88
+ JSR COUT
+ LDA #$A0
+ JSR COUT
+ LDA #$88
+ JMP COUT
