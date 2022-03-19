@@ -1,17 +1,3 @@
-**************************************************
-*                                                *
-*                Warp 6 BBS  CRC                 *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
-  DATE
-----------------------------------
-
 * Table based CRC calculation routine
 *
 * Zero out CRC and CRC+1 before calling first time.

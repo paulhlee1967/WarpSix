@@ -1,20 +1,6 @@
-**************************************************
-*                                                *
-*                Warp 6 BBS  WRAP                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-* Word wrap routine. Searches backwards in our
+* WRAP: Word wrap routine. Searches backwards in our
 * input buffer for a space character and wraps to
 * next line. Wraps maximum of 30 characters.
-
-----------------------------------
- DATE
-----------------------------------
 
 WRAP CMP #$A0 ;Is wrapping character a space?
  BNE :DOWRAP ;No, do the wrap.

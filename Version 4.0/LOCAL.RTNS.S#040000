@@ -1,21 +1,9 @@
-**************************************************
-*                                                *
-*            Warp 6 BBS Local Routines           *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
+* Warp Six LOCAL Routines
 
 * INIT1: init variables & flags, clear screen.
 * send initialization string to modem.
 * Calls: COUT
 * Destroys all registers.
-
-----------------------------------
-  DATE
-----------------------------------
 
 INIT1
  LDA SLOTM get real modem slot

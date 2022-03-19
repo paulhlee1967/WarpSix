@@ -1,36 +1,23 @@
-**************************************************
-*                                                *
-*              Warp 6 BBS SSC.LOADER             *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
+ LST OFF
 
-* Copyright 2022 By Scott Johnson & Paul Lee
+* SSC.Loader
 
-* Instructions:
+* Instructions: 1) assemble this file as is.
 
-* 1) assemble this file as is.
 * 2) change SSC.LOADER to LOCAL.LOADER
 *    and change LOCAL=0 to =1 and assemble again.
 
 * You can change the DSK pathname used to save the object
 * code to whatever you desire.
 
-----------------------------------
- DATE
-----------------------------------
-
- LST OFF
-
- DSK /WARP6/V30/DRIVERS/SSC.LOADER
+ DSK SSC.LOADER
 
 LOCAL = 0 ;set if LOCAL
 
 BEGIN = $8C00 ;start of program
 BEGIN0 = BEGIN-$300-$400 ;start of our buffers
- ;$300 for normal buffers
- ;$400 for file I/O buffer
+   ;$300 for normal buffers
+   ;$400 for file I/O buffer
 
 OLDEXV = BEGIN+$04 ;to save old external vector
 IRQV = BEGIN+$07 ;our IRQ handler address
@@ -162,7 +149,7 @@ MNOPRO
  BGE :LOWER
  LDA #$FF
  STA UCFLAG
-:LOWER CLC ;clear screen and print
+:LOWER CLC  ;clear screen and print
  JSR PRINT
  DA NOPRO
  JMP DOS ;exit to operating system
@@ -173,7 +160,7 @@ MNOBAS
  BGE :LOWER
  LDA #$FF
  STA UCFLAG
-:LOWER CLC ;clear screen and print
+:LOWER CLC  ;clear screen and print
  JSR PRINT
  DA NOBAS
  LDX #$FF
@@ -187,7 +174,7 @@ MUNKNOWN
  BGE :LOWER
  LDA #$FF
  STA UCFLAG
-:LOWER CLC ;clear screen and print
+:LOWER CLC  ;clear screen and print
  JSR PRINT
  DA UNKNOWN
  LDX #$FF
@@ -196,7 +183,7 @@ MUNKNOWN
  JMP COLD
 
 MA3
- CLC ;clear screen and print
+ CLC  ;clear screen and print
  JSR PRINT
  DA A3
  LDX #$FF
@@ -210,7 +197,7 @@ MOLDCPU
  BGE :LOWER
  LDA #$FF
  STA UCFLAG
-:LOWER CLC ;clear screen and print
+:LOWER CLC  ;clear screen and print
  JSR PRINT
  DA OLDCPU
  JMP DOS
@@ -221,7 +208,7 @@ MNO80COL
  BGE :LOWER
  LDA #$FF
  STA UCFLAG
-:LOWER CLC ;clear screen and print
+:LOWER CLC  ;clear screen and print
  JSR PRINT
  DA NO80COL
  JMP DOS
@@ -231,13 +218,13 @@ MNOAUXRAM
  CMP #2+1
  BGE :LOWER
  LDA #$FF
-:LOWER CLC ;clear screen and print
+:LOWER CLC  ;clear screen and print
  JSR PRINT
  DA NOAUXRAM
  JMP DOS
 
 MORGIIE
- CLC ;clear screen and print
+ CLC  ;clear screen and print
  JSR PRINT
  DA ORGIIE
  JMP DOS
@@ -264,7 +251,7 @@ MLCCARD CLC
  JMP DOS
 
 MAPTALK
- CLC ;clear screen and print
+ CLC  ;clear screen and print
  JSR PRINT
  DA APTALK
  JMP DOS
@@ -323,7 +310,7 @@ LOAD2 JSR DOSCMD ;execute cmd through BI
  AND #%00000010 ;80 columns?
  BEQ NOT80
  JSR $C300 ;turn on 80 col. card
-NOT80 RTS ;return
+NOT80 RTS  ;return
 
 ERROR JMP ERROUT
 CALL1 ASC "BLOAD WARP6.DRIVER",8D00
@@ -348,14 +335,14 @@ PRINT BCS :BEGIN
  LDA PRTADR+1
  STA SAV2
 
-:BEGIN PLA ;low byte (from the JSR)
+:BEGIN PLA  ;low byte (from the JSR)
  TAX
  INX
  TXA
  BNE :NOHI ;if not zero, don't inc high byte
 :INCHI STA :RETURN+1 ;low byte of pointer is zero
  STA :GETPTR+1 ;insert low byte of pointer
- PLA ;get high byte
+ PLA  ;get high byte
  TAX
  INX
  TXA
@@ -364,7 +351,7 @@ PRINT BCS :BEGIN
  JMP :NEXT
 :NOHI STA :RETURN+1 ;save low byte of pointer
  STA :GETPTR+1 ;insert low byte of pointer
- PLA ;get high byte
+ PLA  ;get high byte
  STA :RETURN+2 ;save high byte of pointer
  STA :GETPTR+2
 :NEXT LDX #0
@@ -412,7 +399,7 @@ SAV2 DS 1
 
 IDENTIFY LDA $C081 ;read from ROM
 
- SEC ;see if new or old machine
+ SEC  ;see if new or old machine
  JSR $FE1F ;old machines have RTS here.
  BCS :OLD ;if carry still set, old.
  BCC :NEW ;if carry clear, new.
@@ -490,14 +477,14 @@ IDENTIFY LDA $C081 ;read from ROM
 :A2CPLUS LDA #10 ;IIc Plus
  RTS
 
-:NEW CLC ;get into 16 bit mode
+:NEW CLC  ;get into 16 bit mode
  DFB $FB ;XCE
- PHP ;save processor status
+ PHP  ;save processor status
  DFB $C2
  DFB $30 ;REP 30, sets 16 bit
  JSR $FE1F ;call ID routine again
  STY :NEWY
- PLP ;restore 8 bit status
+ PLP  ;restore 8 bit status
  DFB $FB ;XCE
 
  LDA :NEWY+1 ;get Machine ID number
@@ -573,9 +560,9 @@ VBLTEST LDX #$FF
 :TESTVBL LDA VBLINT
  BPL :NOCHANGE
  BMI :GOOD
-:NOCHANGE DEX ;dec 1st counter
+:NOCHANGE DEX  ;dec 1st counter
  BNE :TESTVBL ;loop if non-zero
- DEY ;dec 2nd counter
+ DEY  ;dec 2nd counter
  BNE :TESTVBL ;loop if non-zero
 :BAD
  CLC
@@ -595,14 +582,14 @@ DOS EQU *
  BGE :LOWER
  LDA #$FF
  STA UCFLAG
-:LOWER SEC ;don't clear screen
+:LOWER SEC  ;don't clear screen
  JSR PRINT
  DA EXIT
 
 :KEYWAIT LDA KEYBD
  BPL :KEYWAIT
  STA STROBE
- ;and fall through.
+   ;and fall through.
 
 QUIT JSR MLI
  DFB $65 ;Quit call
@@ -631,7 +618,7 @@ UCFLAG DFB 0
 ATLKCHK JSR MLI
  DFB $42 ;AppleTalk
  DW APPARMS
- RTS ;If carry set, AppleTalk off.
+ RTS  ;If carry set, AppleTalk off.
 
 APPARMS DFB $00 ;anynchronous call
  DFB $02 ;GetInfo call number

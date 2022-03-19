@@ -1,22 +1,8 @@
-**************************************************
-*                                                *
-*               Warp 6 BBS  TOBASIC              *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-* Stuff char in LINBUF for AppleSoft BASIC.
+* TOBASIC: stuff char in LINBUF for AppleSoft BASIC.
 * Prints current char to current output. Output is
 * conditioned by MODEFLG. (Asterisk output if on.)
 * Initiate word wrap if EOL reached in msg entry.
 * Calls: COUT, WRAP, PRBFB, CLRCUR. Destroys all reg.
-
-----------------------------------
- DATE
-----------------------------------
 
 TOBASIC BIT HOTFLG hotkeys on?
  BPL :NOTHOT no.

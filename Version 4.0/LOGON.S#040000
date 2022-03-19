@@ -1,18 +1,4 @@
-**************************************************
-*                                                *
-*               Warp 6  BBS Logon                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-* Save time user logged on at
-
-----------------------------------
-  DATE
-----------------------------------
+* LOGON: save time user logged on at
 
 LOGON JSR GETTIME
  LDA TIME+1 hour

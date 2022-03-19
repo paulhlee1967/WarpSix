@@ -1,16 +1,4 @@
-**************************************************
-*                                                *
-*            Warp 6 BBS Receive (XMODEM)         *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
-  DATE
-----------------------------------
+* Receive (XMODEM)
 
 * Entry point for Xmodem RECEIVE command
 

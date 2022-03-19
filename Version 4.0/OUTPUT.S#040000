@@ -1,22 +1,8 @@
-**************************************************
-*                                                *
-*           Warp 6 BBS Output Routine            *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
 * OUTPUT routine. Connected with PR#A$nnnn
 * This routine is handles output via COUT. Output
 * (including basic PRINT statements) passes through
 * here. Routes to screen and/or modem.
 * Calls: MOUT, C3COUT1, DCDLOST.
-
-----------------------------------
-  DATE
-----------------------------------
 
 OUTPUT STA :OUTTEMP
  PHA

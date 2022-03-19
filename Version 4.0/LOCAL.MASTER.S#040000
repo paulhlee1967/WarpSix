@@ -1,24 +1,13 @@
-**************************************************
-*                                                *
-*          Warp 6 BBS Local Master File          *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-
-* You can change the pathname used to SAVe the object
-* code to whatever you desire.
-
-----------------------------------
-  DATE
-----------------------------------
+ LST OFF
 
 BEGIN = $8C00 ;we need up to $99FF
 
  XC ON
+
+* Warp Six BBS Local Master file
+
+* You can change the pathname used to SAVe the object
+* code to whatever you desire.
 
 GS = 0 ;always 0
 NOIRQ = 1 ;set for LOCAL.DRIVER

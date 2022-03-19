@@ -1,50 +1,28 @@
-**************************************************
-*                                                *
-*             Warp 6 BBS  GS.Loader              *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
+ LST OFF
 
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-* Instructions: assemble this file to save the
-* GS.LOADER to disk. You will need Merlin 16 or 16+
-* to assemble this without getting an error.
+* Local.Loader
 
 * You can change the DSK pathname used to save the object
 * code to whatever you desire.
 
-----------------------------------
-  DATE
-----------------------------------
+ DSK LOCAL.LOADER
 
- LST OFF
-
- USE GSLOAD.MACS
- DSK GS.LOADER
+LOCAL = 1 ;set if LOCAL
 
 BEGIN = $8C00 ;start of program
 BEGIN0 = BEGIN-$300-$400 ;start of our buffers
  ;$300 for normal buffers
  ;$400 for file I/O buffer
- LST ON
-SERGET3 = $950E
-IRQMAST = $9522
-QUICK = $9531
- LST OFF
+
 OLDEXV = BEGIN+$04 ;to save old external vector
 IRQV = BEGIN+$07 ;our IRQ handler address
 PARSEV = BEGIN+$0B ;type cmd vector
-
-SERSAV = SERGET3+5
 
 * General equates
 
 KEYBD = $C000
 STROBE = $C010
 MLI = $BF00
-KVERSION = $BFFF
 CROUT = $FD8E
 GOSYSTEM = $BE70 ;MLI call
 INBUF = $200 ;line input buf
@@ -57,7 +35,7 @@ LEVEL = $BF94 ;file level
 FREBUFR = $BEF8 ;free memory rtn
 GETBFR = $BEF5 ;allocate memory rtn
 MACHID = $BF98
-
+KVERSION = $BFFF
 VBLINT = $C019
 
 * Environment routine equates
@@ -77,7 +55,6 @@ SETVID = $FE93
 
 PRTADR = $FA
 
-
  ORG $2000
 
 ENVIRON CLD
@@ -92,8 +69,6 @@ ENVIRON CLD
  CMP #$4C
  BEQ :OK
  JMP MNOBAS
-
-* ID values returned by IDENTIFY
 
 * 0 = Unknown or non-Apple
 * 1 = Apple II
@@ -115,36 +90,51 @@ ENVIRON CLD
 
 :OK JSR IDENTIFY
  STA SYSID
- CMP #0
- BNE :OLD
+ BNE :CHECK
  JMP MUNKNOWN
-:OLD CMP #3
- BGE :A3
+:CHECK CMP #3 ;Apple II or II Plus?
+ BGE :A3 ;branch if not 1 or 2
  JMP MOLDCPU
-:A3 CMP #3
+:A3 CMP #3 ;Apple III
  BNE :MORE
  JMP MA3
 :MORE LDA MACHID
  AND #%00000010 ;80 columns?
- BNE :COL80
- JMP MOLDCPU
-:COL80 JSR $C300 ;turn on 80 col. card
- LDA SYSID
- CMP #11
- BGE :CHECK1
- JMP MNEEDGS
-:CHECK1 CMP #11 ;rom 00?
- BNE :CHECK2
- JMP MGSROM0
-:CHECK2 CMP #16 ;IIe Card in Mac LC?
- BNE :CHECK3
- JMP MLCCARD
-:CHECK3 CMP #14
- BGE :NEWCPU
- JMP LOADER ;system okay
-:NEWCPU JMP MNEWCPU
+ BNE :AUXRAM
+ JMP MNO80COL
 
-SYSID DS 1
+:AUXRAM LDA MACHID
+ AND #%00010000 ;128K?
+ BNE :COL80
+ JMP MNOAUXRAM
+
+:COL80 JSR $C300 ;turn on 80 col. card
+
+ LDA SYSID
+ CMP #4 ;original IIe
+ BNE :MORE2
+ JMP MORGIIE
+
+:MORE2 CMP #5
+ BNE :CCHK
+ JMP LOADER ;system okay
+
+:CCHK CMP #11
+ BGE :CHECK5
+ JMP MAPIIC
+
+:CHECK5 CMP #11
+ BNE :CHECK6
+ JMP MGSROM0
+
+:CHECK6 CMP #14
+ BGE :NEWCPU
+ CMP #16
+ BNE :GOLOAD
+ JMP MLCCARD
+:GOLOAD JMP LOADER ;system okay
+
+:NEWCPU JMP MNEWCPU
 
 * Error message routines
 
@@ -207,7 +197,7 @@ MOLDCPU
  DA OLDCPU
  JMP DOS
 
-MNEEDGS
+MNO80COL
  LDA SYSID
  CMP #2+1
  BGE :LOWER
@@ -215,8 +205,33 @@ MNEEDGS
  STA UCFLAG
 :LOWER CLC ;clear screen and print
  JSR PRINT
- DA NEEDGS
+ DA NO80COL
  JMP DOS
+
+MNOAUXRAM
+ LDA SYSID
+ CMP #2+1
+ BGE :LOWER
+ LDA #$FF
+:LOWER CLC ;clear screen and print
+ JSR PRINT
+ DA NOAUXRAM
+ JMP DOS
+
+MORGIIE
+ CLC ;clear screen and print
+ JSR PRINT
+ DA ORGIIE
+ JMP DOS
+
+MAPIIC CLC
+ JSR PRINT
+ DA APIICL
+
+* Added support for IIc with Local.Driver in v3.0
+
+ JSR DELAY1
+ JMP LOADER
 
 MGSROM0 CLC
  JSR PRINT
@@ -224,25 +239,14 @@ MGSROM0 CLC
  JSR DELAY1
  JMP LOADER
 
-MLCCARD CLC
- JSR PRINT
- DA LCCARD
- JMP DOS
-
 MNEWCPU CLC
  JSR PRINT
  DA NEWCPU
  JMP DOS
 
-MFATAL
- LDA SYSID
- CMP #2+1
- BGE :LOWER
- LDA #$FF
- STA UCFLAG
-:LOWER CLC ;clear screen and print
+MLCCARD CLC
  JSR PRINT
- DA FATAL
+ DA LCCARD
  JMP DOS
 
 MAPTALK
@@ -253,42 +257,15 @@ MAPTALK
 
 * Reserve space for Warp6.Driver & load into memory
 
-LOADER LDA SYSID
-
-* 11 = Apple IIGS w/ ROM 00
-* 12 = Apple IIGS w/ ROM 01
-* 13 = Apple IIGS w/ ROM 03
-
- XC ON
- CMP #13
- BGE :GONEW
- JSR OLDGS
- BCC :NEXT
- BRA MAPTALK
-
-:GONEW JSR NEWGS
- BCC :NEXT
- BRA MAPTALK
-
-:NEXT
+LOADER
  LDA KVERSION
  CMP #$04
- BLT :MCHK
+ BLT :NEXT
 
  JSR ATLKCHK
  BCC MAPTALK
 
-:MCHK JSR MODEM
- BCC RESERVE
-
- CLC ;clear screen first
- JSR PRINT ;print error
- DA YOURCARD
- JMP DOS
-
-RESERVE CLD
-
- SEI
+:NEXT CLD
  JSR FREBUFR ;ensure memory available
  LDA #0
  STA LEVEL ;zero file level
@@ -319,59 +296,35 @@ LOAD2 JSR DOSCMD ;execute cmd through BI
  LDA #>PARSEV
  STA EXTRNCMD+2
 
- JSR GSSETUP
+ LST ON
+ DO LOCAL-1/1
+ JSR ALLOCATE ;allocate our 6551 IRQ handler
+ FIN
+ LST OFF
 
  JSR VBLTEST
- JSR ALLOCATE ;allocate our ProDOS IRQ handler
- JSR KILLFIRM ;don't let firmware handle SCC
- RTS ;return
+ LDA FLAG80
+ BNE NOT80
+ LDA MACHID
+ AND #%00000010 ;80 columns?
+ BEQ NOT80
+ JSR $C300 ;turn on 80 col. card
+NOT80 RTS ;return
 
 ERROR JMP ERROUT
 CALL1 ASC "BLOAD WARP6.DRIVER",8D00
+FLAG80 DFB $00
+SYSID DS 1
 
 ALLOCATE SEI
-
  LDA $3FE
  STA IRQV
  LDA $3FF
  STA IRQV+1
-
- XC ON
- XC ON
- CLC ;go to native mode
- XCE
- REP #$30 ;with 16-bit registers
- MX %00
-
- PEA $0000 ;push long
- PEA $0000
- PEA $0004 ;Interrupt Manager refnum
-
- LDX #$1103 ;GetVector
- JSL $E10000
-
- PLA ;save orgmgr address
- STA QUICK+1
- PLA
- STA QUICK+3
-
- PEA $0004 ;Interrupt Manager refnum
- PEA $0000 ;bank zero
- PEA #IRQMAST ;our manager address
-
- LDX #$1003 ;SetVector
- JSL $E10000
-
- SEC ;emulation mode
- XCE
- SEP #$30 ;with 8-bit registers
- MX %11
-
- XC OFF
- XC ON
-
  CLI
  RTS
+
+* Other subroutines and data
 
 PRINT BCS :BEGIN
  JSR CLEAR
@@ -409,10 +362,7 @@ PRINT BCS :BEGIN
 :START LDX #$00
 :PRLOOP LDA (PRTADR,X) ;Load and print a char.
  BEQ :PROUT ;Exit on zero byte.
- BIT UCFLAG
- BPL :DOIT
- JSR UPSHIFT
-:DOIT JSR COUT
+ JSR COUT
  INC PRTADR ;Increment address.
  BNE :PRLOOP
  INC PRTADR+1
@@ -432,11 +382,11 @@ PRINT BCS :BEGIN
 :DOHI INC :RETURN+2
  JMP :AFTER
 
-SAV1 DS 1
-SAV2 DS 1
-
 CLEAR JSR HOME
  RTS
+
+SAV1 DS 1
+SAV2 DS 1
 
 **************************
 * IDENTIFIER Source Code *
@@ -537,7 +487,7 @@ IDENTIFY LDA $C081 ;read from ROM
  DFB $FB ;XCE
 
  LDA :NEWY+1 ;get Machine ID number
- BNE :NEWER
+ BNE :NEWER ;newer than IIgs
 
  LDA :NEWY ;ROM version number
  BEQ :GSROM00 ;ROM 00
@@ -545,7 +495,7 @@ IDENTIFY LDA $C081 ;read from ROM
  BEQ :GSROM01 ;ROM 01
  CMP #$03
  BEQ :GSROM03 ;ROM 03
- BNE :NEWGS
+ BNE :NEWGS ;new GS
 
 :GSROM00 LDA #11
  RTS
@@ -602,276 +552,6 @@ DELAYMS CPY #0
 
 DELAY1B DFB 25
 
-
-* KILLFIRM: disable firmware interrupt handler for
-* our serial port
-
-XCE = $FB
-REP = $C2
-SEP = $E2
-PEA = $F4
-JSL = $22
-LDAL = $AF
-STAL = $8F
-
-KILLFIRM LDA SYSID
- CMP #11 ;ROM 00?
- BEQ SERGET1 ;skip the toolbox call on ROM 00
-
- CLC ;native mode
- DFB XCE
- DFB REP #%00110000 ;clear m & x flags
- DFB %00110000 ;clear m & x flags
-
- DFB PEA
- DW $0000 ;push space for result
- DFB PEA
- DW $0000
-
- DFB PEA
- DW $000E ;SerFlag reference no.
-
- DFB $A2 ;LDX
- DW $1603 ;GetAdr call
- DFB JSL
- DW $0000
- DFB $E1 ;JSL ToolLocator
-
- DFB SEP
- DFB %00110000 ;set m & x flags
- SEC ;back to emulation mode
- DFB XCE
-
- PLA ;get low byte
- STA SERGET1+1
- STA SERGET2+1
- STA SERGET3+1
- PLA ;get high byte
- STA SERGET1+2
- STA SERGET2+2
- STA SERGET3+2
- PLA ;get bank byte
- STA SERGET1+3
- STA SERGET2+3
- STA SERGET3+3
- PLA ;get extra byte off stack!
-
-SERGET1 DFB LDAL
- DW $0104 ;get SerFlag
- DFB $E1
-
- STA SERSAV ;save value
- ORA #%00000111 ;disable firmware IRQ handler
- ;for serial port B (Modem)
- ;%00111000 for serial port A
-
-SERGET2 DFB STAL ;save SerFlag
- DW $0104
- DFB $E1
-
-* Use firmware to set up IIGS port for Warp Six
-
-GSSETUP LDA $C20D ;set up jump table
- STA GSINIT+1 ;for Pascal 1.1 firmware
- LDA $C20E
- STA GSREAD+1
- LDA $C20F
- STA GSWRITE+1
- LDA $C210
- STA GSSTAT+1
- LDA $C212
- STA GSCTRL+1
-
- LDX #$C2 ;first, reset the port!
- LDY #$20 ;(absolutely necessary)
- JSR GSINIT
- CPX #0 ;any error?
- BEQ :NEXT
- JMP MFATAL
-
-:NEXT LDA #<:CMDLIST ;next, call extended interface
- LDX #>:CMDLIST
- LDY #0
- JSR GSCTRL
-
- LDA :RESULT
- BEQ :CHECK
- JMP MFATAL
-
-:CMDLIST DFB $03 ;GetModeBits call
- DFB $00
-:RESULT DW $0000
-
-:MODEBITS DW $0000 ;long word returned
- DW $0000
-
-:CHECK LDA :MODEBITS ;determine if comm or ptr
- AND #%00000001 ;check b0 (1=comm 0=ptr)
- BEQ :CMDI
-
-* Save command character
-
-:CMDA LDA #$01 ;Control-A
- STA CMDCHAR
- BNE :CMD0
-:CMDI LDA #$09 ;Control-I
- STA CMDCHAR
-
-* Ensure buffering is off
-
-:CMD0 LDA :MODEBITS+1
- AND #%01000000 ;if buffering disabled, go
- BEQ :READY ;to start of program
-
-* Issue buffering disable command...
-
-:CMD LDA CMDCHAR
- LDX #$C2
- LDY #$20
- JSR GSWRITE ;Buffering Disable cmd
-
-:B LDA #'B'
- LDX #$C2
- LDY #$20
- JSR GSWRITE
-
- LDA #'D'
- LDX #$C2
- LDY #$20
- JSR GSWRITE
-:READY RTS ;GS port setup complete!
-
-CMDCHAR DS 1 ;IIGS serial port cmd char
-
-* Pascal 1.1 Protocol table for IIGS
-
-GSINIT JMP $C200
-GSREAD JMP $C200
-GSWRITE JMP $C200
-GSSTAT JMP $C200
-GSCTRL JMP $C200
-
-
-ATLKCHK JSR MLI
- DFB $42 ;AppleTalk
- DW APPARMS
- RTS ;If carry set, AppleTalk off.
-
-APPARMS DFB $00 ;anynchronous call
- DFB $02 ;GetInfo call number
-ARESULT DS 13 ;result
-
-MODEM
-
-* Check if Slot 2 is set to int. ($00)
-* If so, Slot 2 is set to Modem Port.
-
- JSR SLOT2
- BEQ :OK
- SEC
- RTS
-:OK CLC
- RTS
-
- XC ON
- XC ON
-
-OLDGS
-
-* Check if Slot 1 is ext. ($01) and Slot 7
-* is int. ($00) -- if so, AppleTalk is on.
-
- JSR SLOT1
- CMP #$01
- BNE :OK
- JSR SLOT7
- BNE :OK
- SEC
- RTS
-:OK CLC
- RTS
-
-NEWGS
-
-* Check if either slot 1 or slot 2's type is $02
-* If so, AppleTalk is on.
-
- JSR SLOT1
- CMP #$02
- BEQ :BAD
- JSR SLOT2
- CMP #$02
- BEQ :BAD
- CLC
- RTS
-:BAD SEC
- RTS
-
-
-SLOT1 CLC ;to native mode
- XCE
- REP #$30 ;16 bit m and x
- LONGA 1
- LONGI 1
-
- PEA $0000 ;space for result
- PEA $0021 ;Slot 1 setting
- _ReadBParam ;read battery RAM parameter
- ;(2 byte result left on stack)
-
- PLA ;get port 2 type (2 bytes)
-
- SEC ;emulation mode
- XCE
- LONGA 0
- LONGI 0
- RTS
-
- XC ON
- XC ON
-
-SLOT7 CLC ;to native mode
- XCE
- REP #$30 ;16 bit m and x
- LONGA 1
- LONGI 1
-
- PEA $0000 ;space for result
- PEA $0027 ;Slot 7 setting
- _ReadBParam ;read battery RAM parameter
- ;(2 byte result left on stack)
-
- PLA ;get port 7 type (2 bytes)
-
- SEC ;emulation mode
- XCE
- LONGA 0
- LONGI 0
- RTS
-
-SLOT2
- CLC ;to native mode
- XCE
- REP #$30 ;16 bit m and x
- LONGA 1
- LONGI 1
-
- PEA $0000 ;space for result
- PEA $0022 ;Slot 2 setting
- _ReadBParam ;read battery RAM parameter
- ;(2 byte result left on stack)
-
- PLA ;get port 2 type (2 bytes)
-
- SEC ;emulation mode
- XCE
- LONGA 0
- LONGI 0
- RTS
-
- XC OFF
- XC OFF
-
 * Test if this machine has VBL. Sets NONVBL flag.
 
 VBLTEST LDX #$FF
@@ -884,12 +564,7 @@ VBLTEST LDX #$FF
  DEY ;dec 2nd counter
  BNE :TESTVBL ;loop if non-zero
 :BAD
- LDA SYSID
- CMP #2+1
- BGE :LOWER
- LDA #$FF
- STA UCFLAG
-:LOWER CLC ;clear screen and print
+ CLC
  JSR PRINT
  DA NOVBL
  JMP DOS
@@ -938,3 +613,12 @@ UPSHIFT CMP #"z"+1
 :NO RTS
 
 UCFLAG DFB 0
+
+ATLKCHK JSR MLI
+ DFB $42 ;AppleTalk
+ DW APPARMS
+ RTS ;If carry set, AppleTalk off.
+
+APPARMS DFB $00 ;anynchronous call
+ DFB $02 ;GetInfo call number
+ARESULT DS 13 ;result

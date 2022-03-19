@@ -1,17 +1,3 @@
-**************************************************
-*                                                *
-*               Warp 6 BBS END2.S                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
-  DATE
-----------------------------------
-
 * Make sure external doesn't overwrite driver area
 
  LST ON

@@ -1,12 +1,6 @@
-**************************************************
-*                                                *
-*            Warp 6 BBS  Main Module             *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
+ LST OFF
 
-* Copyright 2022 By Scott Johnson & Paul Lee
+* Warp Six BBS Main module
 
 * This file contains the first part of each modem
 * driver. All modem drivers share the same structure:
@@ -21,12 +15,7 @@
 * These vectors exist to permit interdependencies
 * between modules to be stable.
 
-----------------------------------
-  DATE
-----------------------------------
-
- LST OFF
-
+ LST ON
  DAT
 OUTVEC CLD  ;Output vector, which must be
  JMP OUTPUT ;located on a page boundary.

@@ -1,19 +1,4 @@
-**************************************************
-*                                                *
-*            Warp 6 BBS  GSLOAD.MACS             *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-* Macros for the GS Loader
-
-----------------------------------
-  DATE
-----------------------------------
-
+* Macros for the GS.LOADER
 
 _ReadBParam MAC 
  Tool $C03 

@@ -1,16 +1,4 @@
-**************************************************
-*                                                *
-*              Warp 6 BBS XYGLOBALS              *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
- DATE
-----------------------------------
+* XYGlobals
 
 KSTART DFB 0 ;1k supported
 LSTART DFB 0 ;4k supported

@@ -1,22 +1,7 @@
-**************************************************
-*                                                *
-*               Warp 6 BBS FILTER                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-* Filters bad ctrl chars from input, handles
-* case conversion. C=1 means the input was
-* filtered. C=0 means input okay or modified.
-* 
+* FILTER: filters bad ctrl chars from input,
+* handles case conversion. C=1 means the input
+* was filtered. C=0 means input okay or modified.
 * Calls: UPSHIFT, PRBFB. Destroys X,Y. Result in A.
-
-----------------------------------
-  DATE
-----------------------------------
 
 FILTER ORA #%10000000 ensure high bit set
  CMP #$8D CR?

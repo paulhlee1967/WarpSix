@@ -1,15 +1,14 @@
 * Source code Read Me
 * Written by Jim Ferr
+* January 1995
 *
-* Version 4.0 Updates by
-* Scott Johnson & Paul Lee
-*
-* Public Domain version 4.0
-*
-* 2022-03-17
+* Public Domain version 3.0
 *
 * Here are some tidbits of information about the source code to Warp Six
 * BBS to help those who will follow me.
+*
+* Jim Ferr, Whitby, Ontario.
+*
 *
 * The source code for the modem drivers in Warp Six BBS were written with
 * the Merlin assembler. To use the source files to create the modem drivers
@@ -28,9 +27,11 @@
 * LOCAL.MASTER.S -> LOCAL.DRIVER    local (modem disabled) driver
 *
 * SSC.LOADER.S ---> SSC.LOADER      loads SSC driver
+*
 * SSC.MASTER.S----> SSC.DRIVER      Super Serial card driver
 *
 * GS.LOADER.S ----> GS.LOADER       loads GS driver
+*
 * GS.MASTER.S ----> GS.DRIVER       GS driver
 *
 * CLOADER
@@ -65,6 +66,10 @@
 * In addition, each driver uses a hardware specific source file. The
 * SSC.DRIVER uses the SSC.RTNS.S file, The GS.DRIVER file uses the GS.RTNS.S
 * file, and the LOCAL.DRIVER uses the LOCAL.RTNS.S file.
+*
+* Finally, to create the XYmodem module, you need to assemble XYLOADER.S and
+* XYGLOBALS.S. The XYmodem module uses the CAT.S, SEND.S, RECEIVE.S and CRC.S
+* files.
 *
 * Two additional small files, END.S and END2.S, are used by the drivers and
 * XYmodem modules to ensure your assembled object code has not gone beyond

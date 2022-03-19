@@ -1,26 +1,13 @@
-**************************************************
-*                                                *
-*    Warp 6 BBS CLOADER (Copy Command Loader)    *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
+ LST OFF
+ DSK CLOADER
 
-* Copyright 2022 By Scott Johnson & Paul Lee
+* CLOADER (Copy command Loader)
 
 * Instructions: assemble this file to save the CLOADER
 * module to disk.
 
 * You can change the DSK pathname used to save the object
 * code to whatever you desire.
-
-----------------------------------
-  DATE
-----------------------------------
-
- LST OFF
-
- DSK CLOADER
 
 BHIMEM = $BEFB
 FREBUFR = $BEF8 ;free memory rtn

@@ -1,19 +1,5 @@
-**************************************************
-*                                                *
-*             Warp 6 BBS Parse Routine           *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
 * Parse routine for external commands: TYPE,
 * XCAT, SEND & RECV.
-
-----------------------------------
-  DATE
-----------------------------------
 
 PARSE LDA VPATH1 ;pointer to command buf
  STA :PARSPTR+1 ;save it

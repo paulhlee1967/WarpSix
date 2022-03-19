@@ -1,17 +1,3 @@
-**************************************************
-*                                                *
-*                Warp 6 BBS END.S                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
-  DATE
-----------------------------------
-
 * Make sure we didn't overwrite ProDOS memory areas
 
  LST ON

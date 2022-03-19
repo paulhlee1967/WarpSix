@@ -1,23 +1,9 @@
-**************************************************
-*                                                *
-*               Warp 6 BBS  GETLN                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
 * Get a line of input from user and return it
 * to AppleSoft BASIC. Also handles loss of carrier
 * and sysop commands.
 *
 * Includes idle timeout that disconnects user
 * if inactive beyond the sysop-set timeout.
-
-----------------------------------
-  DATE
-----------------------------------
 
 GETLN BIT WWACTV Any data in wordwrap buf?
  BPL :CURSOR

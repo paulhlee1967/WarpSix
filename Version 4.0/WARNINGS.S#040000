@@ -1,16 +1,4 @@
-**************************************************
-*                                                *
-*          Warp 6 BBS Warning Messages           *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
- DATE
-----------------------------------
+* Warning messages
 
 WARN JSR PRINT
  HEX 8D8D

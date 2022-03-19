@@ -1,23 +1,9 @@
-**************************************************
-*                                                *
-*                Warp 6 BBS  TYPE                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
 * TYPE: Dump file to current output, with Xon/Xoff
 * protocol, space to abort (if FILESTOP off), SPACE will
 * set SPLABORT flag, RETURN will set NXTFLG.
 * Calls: CLRMBUF, SETTMOUT, DECTMOUT, COUT, MBUFCHK,
 * MBUFIN, DCDLOST, MLI (Open, read, close).
 * Clobbers all registers.
-
-----------------------------------
- DATE
-----------------------------------
 
 TYPE JSR CLRMBUF kill any random data
  STZ SPLABORT
@@ -134,7 +120,7 @@ TYPE JSR CLRMBUF kill any random data
 
 :ANSI JSR MPRINT
  HEX 1B
- ASC '[0m',00
+ ASC '[m',00
 
 * end of addition
 

@@ -1,16 +1,4 @@
-**************************************************
-*                                                *
-*      Warp 6 BBS Copyright Message Routine      *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-*----------------------------------
- DATE
-*----------------------------------
+* Copyright message routine
 
 RIGHTS LDX #0
 :PRINT LDA :MSG,X
@@ -23,49 +11,31 @@ RIGHTS LDX #0
 
 * 123456789 123456789 123456789 1234567890
 
-* Warp Six BBS Jim Ferr
-* PD 4.0 Updates by
-* Scott Johnson & Paul Lee
-* In memory of Jim Ferr, Frank Kucharski,
-* & Jim Low
+* Warp Six BBS PD v4.0 by Jim Ferr,
+* Frank Kucharski & Scott Johnson.
 
-
-:MSG HEX 2626 ;cr cr
+:MSG HEX 26 ;cr
  HEX 7C4A595B0B7842530B ;Warp Six
  HEX 6969780B ;BBS
+ HEX 7B6F0B ;PD
+* HEX 5D4E59584244450B ;version
+ HEX 5D ;v
+ HEX 1F051B ;4.0
+* HEX 49 ;b
+ HEX 0B
  HEX 49520B ;by
  HEX 6142460B ;Jim
  HEX 6D4E5959 ;Ferr
- HEX 26 ;cr
-
- HEX 7B6F0B ;PD
- HEX 5D1f051B0B ;v4.0
- HEX 7E5B4F4A5F4E580B ;Updates
- HEX 4952 ;by
- HEX 26 ;cr
-
+ HEX 07 ;,
+ HEX 26
+ HEX 6D594A45400B ;Frank
+ HEX 605E48434A595840420B ;Kucharski
+ HEX 0D0B ;&
+* HEX 4A454F0B ;and
  HEX 7848445F5F0B ;Scott
  HEX 61444345584445 ;Johnson
- HEX 0B0D0B ;&
- HEX 7B4A5E470B ;Paul
- HEX 674E4E ;Lee
- HEX 2626 ;cr cr
-
- HEX 62450B ;In
- HEX 464E464459520B ;memory
- HEX 444D0B ;of
- HEX 6142460B ;Jim
- HEX 6D4E5959 ;Ferr
- HEX 070B ;,
- HEX 6D594A45400B ;Frank
- HEX 605E48434A5958404207 ;Kucharski,
- HEX 26 ;cr
- HEX 0D0B ;&
- HEX 6142460B ;Jim
- HEX 67445C05 ;Low.
-
+ HEX 05 ;.
  HEX 2626AB ;cr cr end
-
 
 * ASCII code 0 = 43 = 2B
 * ASCII code 1 = 42 = 2A

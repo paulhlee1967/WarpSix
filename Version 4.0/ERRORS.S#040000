@@ -1,17 +1,4 @@
-**************************************************
-*                                                *
-*         Warp 6 BBS Error Message Strings       *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
-  DATE
-----------------------------------
-
+* Error message strings
 
 NOPRO HEX 8D
  ASC "Warp Six BBS requires ProDOS 8.",8D8D8700

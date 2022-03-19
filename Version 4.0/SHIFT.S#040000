@@ -1,16 +1,4 @@
-**************************************************
-*                                                *
-*         Warp 6 BBS Case Shift Routines         *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
-
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
-  DATE
-----------------------------------
+* Case shift routines
 
 UPSHIFT CMP #"z"+1
  BGE :NO

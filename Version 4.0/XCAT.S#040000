@@ -1,16 +1,5 @@
-**************************************************
-*                                                *
-*                Warp 6 BBS  XCAT                *
-*                                                *
-*                  Version 4.0                   *
-*                                                *
-**************************************************
+* XCAT
 
-* Copyright 2022 By Scott Johnson & Paul Lee
-
-----------------------------------
- DATE
-----------------------------------
 
 BEGIN = $8C00 ;we need up to $99FF
  ORG BEGIN-$300-$400-$900
@@ -892,4 +881,4 @@ PCHIGH DFB 0
 ERRCOUNT DFB 0
 
  PUT END2
- SAV /WARP6/V30/DRIVERS/XCAT
+ SAV XCAT

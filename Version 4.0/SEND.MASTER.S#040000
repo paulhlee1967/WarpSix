@@ -1,13 +1,13 @@
-* RECV master
+* SEND master
 
- DSK RECV
+ DSK SEND
 
  PUT XEQU
 
- JSR RECV
+ JSR SEND
  JMP UNLOAD
 
  PUT XYGLOBALS
- PUT RECV ;XModem receive
+ PUT SEND ;XModem receive
  PUT CRC ;CRC calc routines
  PUT END2
