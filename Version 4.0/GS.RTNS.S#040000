@@ -306,7 +306,7 @@ CALLCHK JSR MBUFCHK data from modem?
  BNE NORING
  JSR PRINT
  HEX 8D
- ASC "Ring.",8D8D00
+ ASC "Ring.",8D00
  CLC clear means ring
  RTS
 NORING SEC set means no ring
@@ -365,12 +365,11 @@ GETCALL
  LDA #$FF turn on REMFLG (caller online)
  STA REMFLG
 
-* BIT DETECT auto-detect on?
+ BIT DETECT auto-detect on?
+ BMI :PSEID check for ProTERM Special
 
- BRA :PSEID check for ProTERM Special
-
-* CLC
-* RTS
+ CLC
+ RTS
 
 :NOCARR
  JSR HANGUP
@@ -793,48 +792,3 @@ MBUFIN SEI
  INC MBUFHEAD inc head index
  CLI
  RTS
-
-
-* Dial routine
-*
-*DIAL JSR DELAY1 1 second pause
-* JSR MPRINT dial
-* ASC 'ATD',00
-* BIT TONE
-* BPL :PULSE
-* LDA #'T'
-* JSR MOUT
-* BRA DIALIT
-*:PULSE LDA #'P'
-* JSR MOUTV
-*
-* Dial phone number POKEd into NUMBER buffer
-*
-*DIALIT LDY #0
-*:LOOP LDA NUMBER,Y
-* BEQ :DOCR
-* JSR MOUT
-* INY
-* BRA :LOOP
-*:DOCR LDA #$0D
-* JSR MOUT
-* JSR CLRMBUF
-* JSR CONNECT
-*
-* Determine if we are connected
-*
-* BEQ :NOCARR 0=no carrier
-* STA BAUD save baud rate
-* BIT ADJBPS
-* BPL :NEXT
-* JSR DOBAUD adjust our baud rate
-*:NEXT LDA #$FF turn on REMFLG (caller online)
-* STA REMFLG
-* JSR DELAY1 pause a bit
-* CLC
-* RTS  and back we go.
-*
-
-:NOCARR SEC
- RTS
- FIN
