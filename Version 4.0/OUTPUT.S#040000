@@ -17,7 +17,7 @@ OUTPUT STA :OUTTEMP
 * Check for emulation
 
  LDY PSEFLAG
- BNE :MODEMCK no filter
+ BNE :ANSICK check for ANSI
 
 * Modem filter
 
@@ -34,8 +34,16 @@ OUTPUT STA :OUTTEMP
  BEQ :MODEMCK
  BNE :EXIT ;filter it!
 
+:ANSICK LDY PSEFLAG
+ CPY #128
+ BNE :MODEMCK
+ LDA OUTTEMP2
+ BNE :MODEMCK2
+ LDA :OUTTEMP
+
 :MODEMCK AND #%01111111 kill high bit of output
- JSR MOUT
+
+:MODEMCK2 JSR MOUT
  ORA #%10000000 restore high bit
 
  CMP #$8D was it CR?

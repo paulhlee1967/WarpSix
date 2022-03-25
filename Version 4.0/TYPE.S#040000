@@ -40,6 +40,11 @@ TYPE JSR CLRMBUF kill any random data
  BNE :ABORT if not, abort.
 
  LDA CBUF get current byte
+
+* Modification for ANSI
+ STA OUTTEMP2
+* End modification
+
  ORA #%10000000 set high bit
 
  CMP #$8D ;cr?
@@ -124,7 +129,8 @@ TYPE JSR CLRMBUF kill any random data
 
 * end of addition
 
-:OK2 CLC inform BI all is well
+:OK2 STZ OUTTEMP2
+ CLC inform BI all is well
  RTS return to BI.
 
 :GOXONWAIT LDA XTMOUT
@@ -171,3 +177,7 @@ TYPE JSR CLRMBUF kill any random data
 
 CBUF DS 1 char bufr for read
 LASTCH DS 1
+
+* Modification for ANSI
+
+OUTTEMP2 DS 1
