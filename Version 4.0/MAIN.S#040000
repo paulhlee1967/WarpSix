@@ -58,6 +58,7 @@ VIDW DFB 0 ;VI video width (0-255)
 MODEFLG DFB 0 ;MD hidden mode enable flag
 UCASEFLG DFB 0 ;UC convert input to upper
 PSEFLAG DFB 0 ;PS ProTERM Special flag
+ANSIEXT DFB 0 ;AE ANSI Extended Character Flag
 FILESTOP DFB 0 ;FS filestop disable flag
 SPLABORT DFB 0 ;SA spool was aborted flag
 WWACTV DFB 0 ;indicates data in wrap buffer
