@@ -14,10 +14,15 @@ OUTPUT STA :OUTTEMP
  LDY DCDSTATE carrier present?
  BNE :NOCARR no
 
+* Check if sending ANSI extended character
+
+ BIT ANSIEXT
+ BMI :MODEMCK2 ;yes, skip straight to MOUT. We know ANSI is on.
+ 
 * Check for emulation
 
  LDY PSEFLAG
- BNE :MODEMCK no filter
+ BNE :ANSICK ;yes, skip filter & check for ANSI
 
 * Modem filter
 
@@ -34,7 +39,14 @@ OUTPUT STA :OUTTEMP
  BEQ :MODEMCK
  BNE :EXIT ;filter it!
 
-:MODEMCK AND #%01111111 kill high bit of output
+:ANSICK LDY PSEFLAG
+ CPY #128
+ BNE :MODEMCK ;no, do ASCII send
+ LDA OUTTEMP2 ;was character from TYPE
+ BNE :MODEMCK2 ;yes, not null so send it
+ LDA :OUTTEMP ;load our regular character and fall through
+ 
+ :MODEMCK AND #%01111111 kill high bit of output
  JSR MOUT
  ORA #%10000000 restore high bit
 
