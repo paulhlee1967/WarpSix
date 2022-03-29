@@ -10,16 +10,16 @@
 * code to whatever you desire.
 
  USE GSLOAD.MACS
- DSK WARP6.LOADER
+ DSK GS.LOADER
 
 BEGIN = $8C00 ;start of program
 BEGIN0 = BEGIN-$300-$400 ;start of our buffers
  ;$300 for normal buffers
  ;$400 for file I/O buffer
  LST ON
-SERGET3 = $94D7
-IRQMAST = $94EB
-QUICK = $94FA
+SERGET3 = $94F0
+IRQMAST = $9504
+QUICK = $9513
  LST OFF
 OLDEXV = BEGIN+$04 ;to save old external vector
 IRQV = BEGIN+$07 ;our IRQ handler address

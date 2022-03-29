@@ -17,7 +17,7 @@
 
  LST ON
  DAT
-OUTVEC CLD  ;Output vector, which must be
+OUTVEC CLD ;Output vector, which must be
  JMP OUTPUT ;located on a page boundary.
 OLDEXV JMP $FFFF ;set by Warp6.Loader
 
@@ -25,9 +25,9 @@ IRQV DS 2 ;location of P8 irq handler
 
 DCDSTATE DS 1 ;must NOT be on zero page
 
-PARSEV CLD  ;BI external cmd parser
+PARSEV CLD ;BI external cmd parser
  JMP PARSE ;for TYPE, SEND, RECV,
-   ;COPY and XCAT
+ ;COPY and XCAT
 
 * Routines that can be called from other modules
 
@@ -58,10 +58,11 @@ VIDW DFB 0 ;VI video width (0-255)
 MODEFLG DFB 0 ;MD hidden mode enable flag
 UCASEFLG DFB 0 ;UC convert input to upper
 PSEFLAG DFB 0 ;PS ProTERM Special flag
+ANSIFLAG DFB 0 ;AE Extended Character flag
 FILESTOP DFB 0 ;FS filestop disable flag
 SPLABORT DFB 0 ;SA spool was aborted flag
 WWACTV DFB 0 ;indicates data in wrap buffer
-   ;on re-entry to driver
+ ;on re-entry to driver
 NXTFLG DFB 0 ;NF/next bulletin flag
 STARTMIN DFB 0 ;LM logon minute
 STARTHR DFB 0 ;LH logon hour
@@ -81,8 +82,8 @@ DEFBAUD DFB 3 ;2400 baud is default
  ;9600 (4)
  ;19200 (5)
 
-   ;38400 (6)
-   ;57600 (7)
+ ;38400 (6)
+ ;57600 (7)
 
 HOTFLG DFB $0 ;hot keys flag off=0
 
@@ -109,7 +110,7 @@ MBUFHEAD DFB 0 ;head index
 TIMEOUT DFB 4 ;timeout is 4 minutes
 
 XTMOUT DFB 180 ;Pause on control-S for a
-   ;maximum of 180 seconds.
+ ;maximum of 180 seconds.
 
 OKCHECK DFB 30 ;30 seconds between OK checks
 
@@ -129,6 +130,8 @@ RBUFPTR DW $0000 ;bufr ptr
 RREQCNT DFB $00 ;byte request count
  DFB $00 ;high byte 0
 RXFRCNT DW $0000 ;xfer count
+
+ DS 2
 
 OPEN JSR MLI
  LST RTN
@@ -169,7 +172,8 @@ DELAYTICS STA TICS
 DELAY1 PHA
  LST RTN
  LDA #60
- STA TICS
+* STA TICS
+
 :LOOP JSR DELAYTICS
  PLA
  RTS
@@ -219,17 +223,17 @@ CHKVBL LDA VBLINT
 * May be high or low ASCII.
 
  LST ON
-PRINT PLA  ;get low byte
+PRINT PLA ;get low byte
  LST RTN
  INC A ;inc to point at data
  BNE :NOHI ;not zero, don't inc hi
 :INCHI STA :PRTADR ;low byte is zero
- PLA  ;get high byte
+ PLA ;get high byte
  INC A
  STA :PRTADR+1 ;stuff it
  JMP :START
 :NOHI STA :PRTADR ;save low byte
- PLA  ;get high byte
+ PLA ;get high byte
  STA :PRTADR+1 ;stuff it
 
 :START LDA #$AD ;LDA absolute
@@ -262,17 +266,17 @@ PRINT PLA  ;get low byte
 * May be high or low ASCII.
 
  LST ON
-MPRINT PLA  ;get low byte
+MPRINT PLA ;get low byte
  LST RTN
  INC A ;inc to point at data
  BNE :NOHI ;not zero, don't inc hi
 :INCHI STA :PRTADR ;low byte is zero
- PLA  ;get high byte
+ PLA ;get high byte
  INC A
  STA :PRTADR+1 ;stuff it
  JMP :START
 :NOHI STA :PRTADR ;save low byte
- PLA  ;get high byte
+ PLA ;get high byte
  STA :PRTADR+1 ;stuff it
 
 :START LDA #$AD ;LDA absolute
@@ -362,7 +366,7 @@ UPDATE JSR GETTIME get date/time from clock
  LDA TIME minutes
  CMP STARTMIN
  BLT :LESSMIN if cur <, minelap=60-start+cur
- SEC  if cur >=, minelap=cur-start
+ SEC if cur >=, minelap=cur-start
  SBC STARTMIN
  STA MINELAP save result
  JMP :CALCHRS and exit.
@@ -377,7 +381,7 @@ UPDATE JSR GETTIME get date/time from clock
 :CALCHRS LDA TIME+1 hours
  CMP STARTHR either < or >=.
  BLT :LESSHR current < starthr
- SEC  current is >= starthr
+ SEC current is >= starthr
  SBC STARTHR hours elaps=cur-start
  STA HOURELAP store result
  LDA TIME get current minute
@@ -391,17 +395,17 @@ UPDATE JSR GETTIME get date/time from clock
 :LESSHR LDA #24 24 hours in a day
  SEC
  SBC STARTHR hours elapsed =
- CLC  24-start+cur
+ CLC 24-start+cur
  ADC TIME+1
  STA HOURELAP store result
  LDA TIME
  CMP STARTMIN if <, subtract one hour
  BLT :DECHR
-:UPDEXIT RTS  exit.
+:UPDEXIT RTS exit.
 
  LST ON
 ADJBPS DFB $FF ;Adjust baud rate to match
-   ;0=fixed, $FF=match speed
+ ;0=fixed, $FF=match speed
 HSKFLAG DFB 0 ;Handshaking active flag
 
 LFFLAG DFB $FF ;NOT USED /Send line feeds flag
@@ -412,7 +416,7 @@ UNLOAD JSR FREBUFR
  LST RTN
  LDA BHSAVE ;get saved BHIMEM
  STA BHIMEM ;restore original value
- CLC  ;clear carry for BASIC
+ CLC ;clear carry for BASIC
  RTS
 
 * GETEOF. Requires file refnum be stored in

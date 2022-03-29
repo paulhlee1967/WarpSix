@@ -1,8 +1,9 @@
 * Source code Read Me
-* Written by Jim Ferr
-* January 1995
+* Written by & in memory of Jim Ferr
+* Updated by Scott Johnson & Paul Lee
+* March, 2022
 *
-* Public Domain version 3.0
+* Public Domain version 4.0
 *
 * Here are some tidbits of information about the source code to Warp Six
 * BBS to help those who will follow me.
@@ -23,24 +24,22 @@
 *
 * Source file       Object file     Description
 *
-* LOCAL.LOADER.S -> LOCAL.LOADER    local (modem disabled) loader
-* LOCAL.MASTER.S -> LOCAL.DRIVER    local (modem disabled) driver
+* LOCAL.LOADER.S -> LOCAL.LOADER    Local (modem disabled) loader
+* LOCAL.MASTER.S -> LOCAL.DRIVER    Local (modem disabled) driver
 *
-* SSC.LOADER.S ---> SSC.LOADER      loads SSC driver
-*
+* SSC.LOADER.S ---> SSC.LOADER      Loads SSC driver
 * SSC.MASTER.S----> SSC.DRIVER      Super Serial card driver
 *
-* GS.LOADER.S ----> GS.LOADER       loads GS driver
-*
+* GS.LOADER.S ----> GS.LOADER       Loads GS driver
 * GS.MASTER.S ----> GS.DRIVER       GS driver
 *
-* CLOADER
-* COPY
+* CLOADER.S ------> CLOADER         Loads Copy
+* COPY.S ---------> COPY            Copy program (copy filename1,filename2)
 *
-* XCAT
+* XCAT.S ---------> XCAT            Custom Warp6 catalog command (List in Xfer.Util)
 *
-* SEND.MASTER
-* RECV.MASTER
+* SEND.MASTER.S --> SEND            Downloads files to client
+* RECV.MASTER.S --> RECV            Uploads files from client
 *
 * The Loader programs share the ERRORS.S file, which holds loader error
 * messages. The GS.LOADER uses macros in GSLOAD.MACS.S. The modem drivers
@@ -58,23 +57,32 @@
 * CURSOR.S         cursor routines
 * SHIFT.S          case shift routines
 * PARSE.S          parse BI cmd
-* TYPE             TYPE command
-* WARNINGS         warning msgs
-* LOGON            logon routine
-* RIGHTS           copyright routine
+* TYPE.S           TYPE command
+* WARNINGS.S       warning msgs
+* LOGON.S          logon routine
+* RIGHTS.S         copyright routine
+* END.S & END2.S   warn if driver doesn't fit in memory allocated by ORG
+* INPUT.ANY.S      line input routine which accepts "illegal" characters.
+* COPYCAT.S        ML helper for COPY.UTIL in sysop menu for selecting files.
 *
 * In addition, each driver uses a hardware specific source file. The
 * SSC.DRIVER uses the SSC.RTNS.S file, The GS.DRIVER file uses the GS.RTNS.S
 * file, and the LOCAL.DRIVER uses the LOCAL.RTNS.S file.
 *
-* Finally, to create the XYmodem module, you need to assemble XYLOADER.S and
-* XYGLOBALS.S. The XYmodem module uses the CAT.S, SEND.S, RECEIVE.S and CRC.S
-* files.
+*** GS Drivers Only***
+* When compiling your drivers, Merlin will show memory addresses for SERGET3,
+* IRQMAST, & QUICK upon completion. You must enter these addresses in the EQUs
+* in the matching LOADER program for the driver you're compiling and then compile
+* the loader. 
 *
-* Two additional small files, END.S and END2.S, are used by the drivers and
-* XYmodem modules to ensure your assembled object code has not gone beyond
-* the available memory. If this occurs, you'll get an error during
-* assembly.
+* Finally, to create the SEND and RECV modules, you need to assemble 
+* SEND.MASTER.S & RECV.MASTER.S. SEND.MASTER.S uses the XEQU, XYGLOBALS, SEND,
+* & CRC files. RECV.MASTER.S uses the XEQU, XYGLOBALS, RECV, & CRC files.
+*
+* Two additional small files, END.S and END2.S, are used to ensure your assembled
+* object code has not gone beyond the available memory. If this occurs, you'll
+* get an error during assembly and you'll need to trim some code or adjust the
+* ORG address before recompiling.
 *
 * Memory Usage
 *
@@ -95,6 +103,10 @@
 * $8A00 to $8AFF is LINBUF, the line input buffer
 * $8900 to $89FF is WWBUF, the word wrap buffer
 * $8500 to $88FF is IOBUF, the driver's ProDOS file I/O buffer
+* &8000 to $84FF is COPY, SEND, or RECV. They load, run, and unload.
+* $7C00 to $84FF is XCAT. It loads, runs, and unloads.
+* $300  to $3CF  is INPUT.ANY. Line input utility.
+* $300  to $3CF  is COPYCAT. Copy.Util helper program for selecting files.
 *
 * When external modules are not running, that's it for Warp Six memory use.
 * (External modules are COPY, SEND, RECV and XCAT.)

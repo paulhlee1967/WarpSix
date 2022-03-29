@@ -9,5 +9,5 @@ RIGHTS LDX #0
 :EXIT RTS
 
 :MSG HEX 8D8D ;cr cr
- ASC "Driver v4.0b1"
+ ASC "Driver v4.0"
  HEX 8D00 ;cr end
