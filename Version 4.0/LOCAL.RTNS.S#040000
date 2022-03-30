@@ -36,6 +36,8 @@ INIT1
  STZ WWCHAR
  STZ WWACTV
  STZ PSEFLAG
+ STZ ANSIFLAG
+
  JSR HOME ;clear screen
  RTS
 
@@ -84,7 +86,7 @@ GETCALL
 
 :MCHECK
  CLC
- RTS  ;return to BASIC
+ RTS ;return to BASIC
 
 REMOVE CLI
  RTS
@@ -125,8 +127,8 @@ MOUT RTS
 MBUFCHK SEI
  LDX MBUFTAIL get tail index
  CPX MBUFHEAD compare to head index
- CLI  if different, data is
- RTS  ready.
+ CLI if different, data is
+ RTS ready.
 
 * CLRMBUF: clear mbuf.
 

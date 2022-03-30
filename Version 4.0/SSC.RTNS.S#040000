@@ -37,6 +37,7 @@ INIT1
  STZ WWCHAR
  STZ WWACTV
  STZ PSEFLAG
+ STZ ANSIFLAG
 
  LDA #<IRQIN ;ensure irq vector points to
  STA $3FE ;our routine!
@@ -108,9 +109,9 @@ INIT2 LDA DEFBAUD ;get default baud rate
 :MPATH1 DA :MPATH
 :MPATH STR 'MODEM.INIT'
 
-:CLOSE2 PHA  save error code if any
+:CLOSE2 PHA save error code if any
  JSR CLOSE
- PLA  recover err code
+ PLA recover err code
  BEQ :OK
  CMP #$4C end of file encountered?
  BEQ :OK no, real error
@@ -156,10 +157,10 @@ CALLCHK JSR MBUFCHK data from modem?
  BNE NORING
  JSR PRINT
  HEX 8D
- ASC "Ring.",8D8D00
- CLC  clear means ring
+ ASC "Ring.",8D00
+ CLC clear means ring
  RTS
-NORING SEC  set means no ring
+NORING SEC set means no ring
  RTS
 
 * GETCALL: await call, local logon, or quit command.
@@ -333,7 +334,7 @@ ANSWER LDA #50
  JSR DELAYTICS
 
  JSR PRINT print to screen
- ASC "Answering...",8D8D00
+ ASC "Answering...",8D00
 
  JSR CLRMBUF
  JSR MPRINT print to modem
@@ -347,24 +348,35 @@ CONNECT LDA #45
  LDX #0 ;index into codes table
 
 :TEST1 LDA RESBUF ;check 1st char of result
- CMP RESULTS,Y
+ CMP :RESULTS,Y
  BEQ :TEST2
 
-:MISS1 INY  ;skip over 2nd char
-:MISS2 INY  ;looking at next result
- INX  ;next code.
+:MISS1 INY ;skip over 2nd char
+:MISS2 INY ;looking at next result
+ INX ;next code.
  CPX #6 ;past end of table?
  BGE :NOCAR ;bad result.
  BRA :TEST1 ;continue testing.
 
-:TEST2 INY  ;compare 2nd in table
+:TEST2 INY ;compare 2nd in table
  LDA RESBUF+1 ;with 2nd char of result
- CMP RESULTS,Y
+ CMP :RESULTS,Y
  BNE :MISS2 ;no match this time.
- LDA CODES,X
+ LDA :CODES,X
  RTS
 :NOCAR LDA #0
  RTS
+
+:RESULTS ASC '3 ' ;0 = NO CARRIER
+ ASC '1 ' ;1  = 300
+ ASC '5 ' ;5  = 1200
+ ASC '10' ;10 = 2400
+ ASC '11' ;11 = 4800
+ ASC '12' ;12 = 9600
+ ASC '14' ;14 = 19200
+ ASC '16' ;16 = 19200
+
+:CODES HEX 00,01,02,03,04,05,06,06
 
 RESBUF DS 2 buffer for result codes
 
@@ -495,7 +507,7 @@ HANGUP SEI
 BAUDOR DFB $06 300 baud 'or' value
  DFB $08 1200
  DFB $0A 2400
-* DFB $0C 4800
+ DFB $0C 4800
  DFB $0E 9600
  DFB $0F 19200
 
@@ -504,23 +516,23 @@ BAUDOR DFB $06 300 baud 'or' value
 * there is incoming data. Maintains DCDSTATE. Adds any
 * input to MBUF. A, X destroyed. Y holds slot $n0.
 
-IRQIN PHA  ;save registers
+IRQIN PHA ;save registers
  PHX
  PHY
 
  LDY SLOT16 ;get status
  LDA STATREG,Y
 
- TAX  ;save 6551 status
+ TAX ;save 6551 status
  AND #%01000000 ;save DCD state
  STA DCDSTATE ;non-zero means offline
- TXA  ;restore 6551 status
+ TXA ;restore 6551 status
  BPL :OURS
 
 :DATACHK AND #%00001000 ;incoming data?
  BEQ :OURS ;always.
 
-:MAYBE TXA  ;restore saved status
+:MAYBE TXA ;restore saved status
  AND #%00000111 ;mask all but err bits
  BEQ :SKIP ;good char.
  LDA DATAREG,Y ;waste data
@@ -538,18 +550,18 @@ IRQIN PHA  ;save registers
 
 :OURS LDA STATREG,Y ;read again
  LDA DATAREG,Y ;read again
- PLY  ;restore registers
+ PLY ;restore registers
  PLX
  PLA
  CLI
- RTI  ;return from interrupt
+ RTI ;return from interrupt
 
 * MOUT: send character in A to modem, regardless of
 * carrier state. Preserves all registers.
 
-MOUT PHX  ;save X
- PHY  ;save Y
- PHA  ;save A
+MOUT PHX ;save X
+ PHY ;save Y
+ PHA ;save A
 
  LDY SLOT16
 :SEND LDA STATREG,Y
@@ -557,12 +569,12 @@ MOUT PHX  ;save X
  BNE :READY
 
  LDX #$40 ;was $80.
-:WAIT NOP  ;short delay
- DEX  ;to prevent overwriting
+:WAIT NOP ;short delay
+ DEX ;to prevent overwriting
  BNE :WAIT ;incoming irq's...
  BEQ :SEND
 
-:READY PLA  ;get char to send
+:READY PLA ;get char to send
  STA DATAREG,Y
  PLY
  PLX
@@ -571,25 +583,25 @@ MOUT PHX  ;save X
 * MBUFCHK: see if data ready in MBUF.
 * BEQ for no data, BNE for data.
 
-MBUFCHK   ; SEI
+MBUFCHK ; SEI
  LDX MBUFTAIL get tail index
  CPX MBUFHEAD compare to head index
-   ; CLI  if different, data is
- RTS  ready.
+ ; CLI  if different, data is
+ RTS ready.
 
 * CLRMBUF: clear mbuf.
 
 CLRMBUF PHP
  SEI
- PHA  ;save A
- PHY  ;save Y
+ PHA ;save A
+ PHY ;save Y
  STZ MBUFHEAD ;reset buffer pointers
  STZ MBUFTAIL
  LDY SLOT16
  LDA STATREG,Y ;ensure no irq pending
  LDA DATAREG,Y ;and no data available.
- PLY  ;restore Y
- PLA  ;restore A
+ PLY ;restore Y
+ PLA ;restore A
  PLP
  RTS
 
