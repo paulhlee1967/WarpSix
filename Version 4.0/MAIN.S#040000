@@ -81,7 +81,6 @@ DEFBAUD DFB 3 ;2400 baud is default
  ;2400 (3)
  ;9600 (4)
  ;19200 (5)
-
  ;38400 (6)
  ;57600 (7)
 
@@ -445,6 +444,7 @@ EOFHI DS 1
 * Modem result and baud rate return codes
 
  LST ON
+
 RESULTS ASC '3 ' ;0  = NO CARRIER
  ASC '1 ' ;1  = 300
  ASC '5 ' ;5  = 1200
@@ -452,8 +452,10 @@ RESULTS ASC '3 ' ;0  = NO CARRIER
  ASC '12' ;12 = 9600
  ASC '14' ;14 = 19200
  ASC '16' ;16 = 19200
-* ASC '28' ;28 = 38400
-* ASC '18' ;18 = 57600
+ ASC '17' ;17 = 38400
+ ASC '28' ;28 = 38400
+ ASC '18' ;18 = 57600
 
-CODES HEX 00,01,02,03,04,05,05
+CODES HEX 00,01,02,03,04,05,05,06,06,07
+
  LST RTN

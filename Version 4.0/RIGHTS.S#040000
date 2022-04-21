@@ -8,6 +8,6 @@ RIGHTS LDX #0
  BNE :PRINT ;always (stringlen < 255 always)
 :EXIT RTS
 
-:MSG HEX 8D8D ;cr cr
- ASC "Driver v4.0"
+:MSG HEX 8D ;cr cr
+ ASC "Driver v4.0.1"
  HEX 8D00 ;cr end

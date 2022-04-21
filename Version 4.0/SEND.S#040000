@@ -119,7 +119,7 @@ SENDPRO1 ;set non-ProDOS as default
  LDA TRYCOUNT
  BNE :RETRY
  ;if too many ProDOS tries
-   ;try non-ProDOS mode.
+ ;try non-ProDOS mode.
 
 :GOSEND LDA #60 ;one long (60 second) timeout
  STA TIMEOUT ;fall through to SENDDATA
@@ -190,8 +190,8 @@ YBATCH BIT CRCFLAG
  LDY #0
  LDX #0
 :START STY :FIRST ;save offset of first byte
- INY  ;increment for first char
-   ;of filename
+ INY ;increment for first char
+ ;of filename
 :LOOP LDA YPATHS,Y ;get a byte
  CMP #'*' ;our end of file marker?
  BNE :CHECK
@@ -200,8 +200,8 @@ YBATCH BIT CRCFLAG
  BNE :FNAME ;always
 :CHECK CMP #'!' ;end/beginning of fname?
  BEQ :FNAME
-:INC INY  ;increment main index
- INX  ;increment fname index
+:INC INY ;increment main index
+ INX ;increment fname index
  BRA :LOOP ;and continue reading fname
 :FNAME STY :YTEMP ;save Y
  STX :FSTART ;length of last fname
@@ -216,7 +216,7 @@ YBATCH BIT CRCFLAG
 
  LDX #0
  LDY :YTEMP ;restore Y
- CLC  ;start new filename
+ CLC ;start new filename
  BCC :START
 
 * local data area
@@ -253,30 +253,30 @@ YCONT INC YCOUNT ;inc Ymodem file counter
 :CHECK CPX YCOUNT ;are we at the right file?
  BEQ :COPY ;if so, copy filename.
 
-:SKIP   ;if not, skip this filename.
+:SKIP ;if not, skip this filename.
  LDA YPATHS,Y ;get length
  STA :LENGTH
- TYA  ;get current position
+ TYA ;get current position
  CLC
  ADC :LENGTH ;add to length
  STA :LENGTH ;save result
- TAY  ;put in Y as index
- INY  ;add one.
- INX  ;inc file counter
- CLC  ;go to next file
+ TAY ;put in Y as index
+ INY ;add one.
+ INX ;inc file counter
+ CLC ;go to next file
  BCC :CHECK
 
 :COPY LDA VPATH1 ;copy pointer
  STA PRTADR
  LDA VPATH1+1
  STA PRTADR+1
- TYA  ;copy our index into YPATHS
- TAX  ;into X.
+ TYA ;copy our index into YPATHS
+ TAX ;into X.
  LDY #0 ;zero out Y
  LDA YPATHS,X ;get length
  STA :LENGTH
  STA (PRTADR),Y
- INX  ;point at 1st char of fname
+ INX ;point at 1st char of fname
  INY
 
 :LOOP LDA YPATHS,X
@@ -341,7 +341,7 @@ YCONT INC YCOUNT ;inc Ymodem file counter
 * Find out how many dots in filename and pos'n of
 * the last dot.
 
- TAY  ;length in Y
+ TAY ;length in Y
 :DLOOP LDA (PRTADR),Y
  CMP #'.'
  BEQ :DOT
@@ -388,7 +388,7 @@ YCONT INC YCOUNT ;inc Ymodem file counter
 
  CPX #8 ;X holds destination index
  BGE :ZERO ;done if > 8
-   ;otherwise, stuff it.
+ ;otherwise, stuff it.
 
 :STUFF STA PACKBUF,X ;save in PACKBUF
  INX
@@ -546,7 +546,7 @@ CHKBIN2 BIT BINARY2 ;check flag
  BEQ :NOBIN ;header already here!
 
 :DOBIN JSR SENDBIN2 ;create/send Binary II pak
-   ;fall through to :NOBIN
+ ;fall through to :NOBIN
 
 :NOBIN LDA LSTART
  STA LFLAG
@@ -570,11 +570,11 @@ SENDDATA LDA BADCNT ;did we have problems with
  BEQ :BEGIN ;last packet?
  ;if so, zero bad count (as
  STZ BADCNT ;we must have finally got
-   ;a good one.
+ ;a good one.
  JSR DROP ;change packet size flags
-   ;(drop from 4K to 1K or
-   ;from 1K to 128.)
-   ;to avoid further errors
+ ;(drop from 4K to 1K or
+ ;from 1K to 128.)
+ ;to avoid further errors
  JSR DOFLAGS ;ensure packet size modified
 
 :BEGIN JSR PACKCLR ;fill packet buffer with ^Z's
@@ -810,7 +810,7 @@ CHKYMODE
 SNDDONE JSR DISPLAYX
  JSR DELAYV ;pause for 1 second
  STZ XERROR flag as successful transfer
- CLC  ;inform BASIC that all is well
+ CLC ;inform BASIC that all is well
  RTS
 
 * Subroutines
@@ -882,7 +882,7 @@ SENDPAK BIT LFLAG ;4k mode?
  LDA DCDSTATE ;carrier present?
  BNE :NOGOOD
 
- CLC  ;return without error
+ CLC ;return without error
  RTS
 
 :CSUM LDA CHECKSUM ;and send it
@@ -1006,19 +1006,19 @@ SENDBIN2 JSR PACKZERO ;zero packet contents!
 :LOOP LDA (PRTADR),Y ;get a character
  CMP #'/' ;ProDOS separator?
  BEQ :CHOP ;if so, chop off
- INX  ;inc filename length
- DEY  ;dec pointer
+ INX ;inc filename length
+ DEY ;dec pointer
  BNE :LOOP ;branch if not done.
 
-:CHOP TXA  ;get length
+:CHOP TXA ;get length
  STA FILEBUF+23 ;put in buffer
- INY  ;inc pointer to 1st char
+ INY ;inc pointer to 1st char
 
  LDX #1
 :COPY LDA (PRTADR),Y ;get a character
  STA FILEBUF+23,X ;copy for Binary II
  INX
- INY  ;inc pointer
+ INY ;inc pointer
  CPY :OLDLEN ;compare to old len + 1
  BNE :COPY
 
@@ -1029,7 +1029,7 @@ SENDBIN2 JSR PACKZERO ;zero packet contents!
  JSR GETBYTE
  BCC :CHECK ;branch if byte received.
 
-:GOABORT PLA  ;nested rtn; do a POP.
+:GOABORT PLA ;nested rtn; do a POP.
  PLA
  JMP SNDABORT1 ;abort on timeout
 
@@ -1050,7 +1050,7 @@ SENDBIN2 JSR PACKZERO ;zero packet contents!
  PLA
  JMP SNDABORT
 
-:ERROR TAX  ;save error code
+:ERROR TAX ;save error code
  PLA
  PLA
  TXA
@@ -1104,7 +1104,7 @@ STEPUP BIT LFLAG ;already in 4k mode?
 
  ;reset good count so we
  STZ GOODCNT ;don't jump to 4K on next
- RTS  ;successful packet.
+ RTS ;successful packet.
 
 :KTOL ;step up to 4K mode
  STZ KFLAG

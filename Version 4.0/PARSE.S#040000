@@ -35,8 +35,8 @@ PARSE LDA VPATH1 ;pointer to command buf
  STA PBITS
  STZ PBITS+1
 
- CLC  ;claim command
- RTS  ;return to BI.
+ CLC ;claim command
+ RTS ;return to BI.
 
 * First external command
 
@@ -80,7 +80,7 @@ PARSE LDA VPATH1 ;pointer to command buf
 
 * Not our command
 
-:NOT SEC  not ours
+:NOT SEC not ours
  JMP OLDEXV jump to old xtrn vector
 
 * Third external command
@@ -127,8 +127,8 @@ PARSE LDA VPATH1 ;pointer to command buf
  STA PBITS ;two filenames expected
  STZ PBITS+1 ;slot and drive not allowed
 
- CLC  ;claim the command
- RTS  ;return to the BI
+ CLC ;claim the command
+ RTS ;return to the BI
 
 :OURCMD ASC 'TYPE' ;built-in
 :OURCMD1 ASC 'XCAT' ;cmd 1 auto-load, execute, unload
@@ -176,9 +176,9 @@ PARSE LDA VPATH1 ;pointer to command buf
 * Copy command name
 
  LDA :CMDCODE
- ASL  ;multiply by 4
+ ASL ;multiply by 4
  ASL
- TAX  ;index in X
+ TAX ;index in X
  LDY #0
 :PUSH LDA :OURCMD,X
  STA PATH1+6,Y
@@ -220,7 +220,7 @@ PARSE LDA VPATH1 ;pointer to command buf
  CLC
  RTS
 
-:OTHER   ;parms for SEND/RECV
+:OTHER ;parms for SEND/RECV
 
  LDA #%00000001 ;first filename expected.
  STA PBITS

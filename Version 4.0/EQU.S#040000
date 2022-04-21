@@ -36,11 +36,11 @@ GSDATAA = $C03B
 
 WR11A = %11010000 ;init wr11 in Ch A
 WR11B = %01010000 ;init wr11 in Ch B
-   ;crystal not used by Ch B
-   ;3.6864MHz external crystal
-   ;Rx/Tx clock source = BRG
-   ;TRxC is an input (tied to cts)
-   ;bits 1 and 0 insignificant
+ ;crystal not used by Ch B
+ ;3.6864MHz external crystal
+ ;Rx/Tx clock source = BRG
+ ;TRxC is an input (tied to cts)
+ ;bits 1 and 0 insignificant
 
 RESETCHA = %11001010 ;constant to reset Ch A
 RESETCHB = %01001010 ;constant to reset Ch B

@@ -518,38 +518,24 @@ CONNECT LDA #45
  LDX #0 ;index into codes table
 
 :TEST1 LDA RESBUF ;check 1st char of result
- CMP :RESULTS,Y
+ CMP RESULTS,Y
  BEQ :TEST2
 
 :MISS1 INY ;skip over 2nd char
 :MISS2 INY ;looking at next result
  INX ;next code.
- CPX #11 ;past end of table?
+ CPX #10 ;past end of table?
  BGE :NOCAR ;bad result.
  BRA :TEST1 ;continue testing.
 
 :TEST2 INY ;compare 2nd in table
  LDA RESBUF+1 ;with 2nd char of result
- CMP :RESULTS,Y
+ CMP RESULTS,Y
  BNE :MISS2 ;no match this time.
- LDA :CODES,X
+ LDA CODES,X
  RTS
 :NOCAR LDA #0
  RTS
-
-:RESULTS ASC '3 ' ;0  = NO CARRIER
- ASC '1 ' ;1  = 300
- ASC '5 ' ;5  = 1200
- ASC '10' ;10 = 2400
- ASC '11' ;11 = 4800
- ASC '12' ;12 = 9600
- ASC '14' ;14 = 19200
- ASC '16' ;16 = 19200
- ASC '17' ;17 = 38400
- ASC '28' ;28 = 38400
- ASC '18' ;18 = 57600
-
-:CODES HEX 00,01,02,03,04,05,06,06,07,07,08
 
 RESBUF DS 2 buffer for result codes
 
@@ -718,11 +704,11 @@ DOBAUD PHP
  SEI
 
  LDY BAUD ;check user's value
- CPY #8+1 ;outside legal range?
+ CPY #7+1 ;outside legal range?
  BGE :BAD
  CPY #0 ;zero?
  BNE :GOOD
-:BAD LDY #6 ;force to 19200 if bad
+:BAD LDY #5 ;force to 19200 if bad
 
 :GOOD
  LDA #12
@@ -740,20 +726,20 @@ DOBAUD PHP
 BAUDL DFB 126 ;300 bps (1)
  DFB 94 ;1200 (2)
  DFB 46 ;2400 (3)
- DFB 22 ;4800 (4)
- DFB 10 ;9600 (5)
- DFB 4 ;19200 (6)
- DFB 1 ;38400 (7)
- DFB 0 ;57600 (8)
+* DFB 22 ;4800 (4)
+ DFB 10 ;9600 (4)
+ DFB 4 ;19200 (5)
+ DFB 1 ;38400 (6)
+ DFB 0 ;57600 (7)
 
 BAUDH DFB 1 ;300 bps (1)
  DFB 0 ;1200 (2)
  DFB 0 ;2400 (3)
- DFB 0 ;4800 (4)
- DFB 0 ;9600 (5)
- DFB 0 ;19200 (6)
- DFB 0 ;38400 (7)
- DFB 0 ;57600 (8)
+* DFB 0 ;4800 (4)
+ DFB 0 ;9600 (4)
+ DFB 0 ;19200 (5)
+ DFB 0 ;38400 (6)
+ DFB 0 ;57600 (7)
 
 * MBUFCHK: see if data ready in MBUF.
 * BEQ for no data, BNE for data.

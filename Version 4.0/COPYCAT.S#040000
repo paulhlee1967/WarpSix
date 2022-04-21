@@ -1,0 +1,134 @@
+**********************************************
+*                                            *
+*     CopyCat - Build file & folder list     *
+*                                            *
+**********************************************
+
+ ORG $300
+
+VARTAB = $69 ;Contains address of variable table
+LOCKFLAG = $06 ;Display based on lock status
+DIRFLAG = $07 ;Display based of DIR or not
+TXFLAG = $08 ;Called by XFER
+SKIPFLAG = $FB ;Filename discard flag
+PTR = $FC ;Actual address of variable table
+
+START LDA #$00 ;Load zero
+ STA SKIPFLAG ;Initialize skip flag
+
+READ LDY #$03 ;Load offset for low byte of string address
+ LDA (VARTAB),Y ;Get it
+ STA PTR ;Save low byte
+ INY  ;Load offset for hi byte
+ LDA (VARTAB),Y ;Get it
+ STA PTR+1 ;Save hi byte
+
+DIR LDY #$11 ;Load filetype pos 1
+ LDA (PTR),Y ;Get 1st char of filetype
+ CMP #'D' ;Is it a D
+ BNE NOTDIR ;No. Goto NOTDIR and check flag
+ INY ;Load filetype pos 2
+ LDA (PTR),Y ;Get 2nd char of filetype
+ CMP #'I' ;Is it an I
+ BNE NOTDIR ;No. Goto NOTDIR and check flag
+
+ISDIR LDA DIRFLAG ;Load DIRFLAG value
+ CMP #$FF ;DIR only set?
+ BEQ GODONE ;Its a DIR and that's what we want
+ JMP SKIP ;Don't want DIRs. Skip it
+GODONE JMP DONE ;Too far to branch, must JMP
+
+NOTDIR LDA DIRFLAG ;Load DIRFLAG value
+ CMP #$00 ;No DIRs set?
+ BEQ CHKLCK ;Not a DIR so continue
+ JMP SKIP ;We only want DIRs so skip
+
+CHKLCK LDA LOCKFLAG ;Load lockflag
+ CMP #$80 ;Compare to 128 (show all files)
+ BEQ FINDER ;If 128 then go to Finder
+ CMP #$00 ;Compare to 0 (show unlocked)
+ BEQ SKPLCK ;Check for locked files & skip
+ CMP #$FF ;Compare to 255 (show locked)
+ BEQ SHWLCK ;Check for locked files & show
+
+SKPLCK LDY #$00 ;Offset for 1st char
+ LDA (PTR),Y ;Get 1st char
+ CMP #'*' ;Is it *
+ BEQ SKIP ;Yes. Skip locked files
+ JMP FINDER ;No. Do more checks
+
+SHWLCK LDY #$00 ;Offset for 1st char
+ LDA (PTR),Y ;get 1st char
+ CMP #' ' ;Is it a space
+ BEQ SKIP ;Yes. Skip unlocked files
+
+FINDER LDY #$11 ;Load filetype pos 1
+ LDA (PTR),Y ;Get 1st char of filetype
+ CMP #'$' ;Is it a $
+ BNE SHORTEN ;NO. Check if .D or .H
+ LDY #$12 ;Load filetype pos 2
+ LDA (PTR),Y ;Get 2nd char of filetype
+ CMP #'C' ;Is it a C
+ BNE BAD ;No. Check if bad blocks
+ LDY #$13 ;Load filetype pos 3
+ LDA (PTR),Y ;Get 3rd char of filetype
+ CMP #'9' ;Is it a 9
+ BEQ SKIP ;Yes. Skip and get another filename
+ICONS CMP #'A' ;Is it an A
+ BEQ SKIP ;Yes. Skip and get another filename
+ JMP SHORTEN ;No and can't be bad
+BAD LDY #$12 ;Load filetype pos 2
+ LDA (PTR),Y ;Get 2nd char of filetype
+ CMP #'0' ;Is it a zero
+ BNE SHORTEN ;No and can't be dir
+ LDY #$13 ;Load filetype pos 3
+ LDA (PTR),Y ;Get 3rd char of filetype
+ CMP #'1' ;Is it a 1
+ BEQ SKIP ;Yes. Skip and get another filename
+
+SHORTEN LDA TXFLAG ;Load XFER flag
+ CMP #$FF ;Did we come from XFER?
+ BNE DONE ;No. Don't need more checks
+ LDY #$02 ;Load offset for length
+ LDA #$0F ;Load accumulator with 16
+ STA (VARTAB),Y ;Set length to just filename
+ TAY  ;Load length into Y so we can strip spaces
+
+STRIPR LDA (PTR),Y ;Load the Y character from the string
+ CMP #' ' ;Compare to <space>
+ BNE DCHK ;If not equal then spaces are gone. Exit
+ DEY  ;Decrement Y by one to check next character
+ JMP STRIPR ;Jump back to beginning of loop
+
+DCHK DEY  ;Pos for next to last char
+ LDA (PTR),Y ;Load next to last char
+ CMP #'.' ;Check for period
+ BNE DONE ;No. Not a .D or .H file.
+ INY  ;Prepare to check last char
+ LDA (PTR),Y ;Load last char
+ CMP #'D' ;Check for D
+ BEQ SKIP ;This is a .D file. Skip
+HCHK CMP #'H' ;Check for H
+ BEQ SKIP ;This is a .H file. Skip
+
+DONE INC PTR ;Increment PTR to strip left byte from string
+ BNE NOTHI ;Check iflow byte rolled to 00
+ INC PTR+1 ;Yes. Increment Hi byte also
+NOTHI LDY #$04 ;Load Y offset
+ LDA PTR+1 ;Load PTR+1 to accumulator
+ STA (VARTAB),Y ;Save Hi byte
+ DEY  ;Decrement Y offset
+ LDA PTR ;Load PTR to accumulator
+ STA (VARTAB),Y ;Save low byte
+ DEY  ;Decrement Y offset
+ LDA #$0F ;Load 15
+ STA (VARTAB),Y ;Save new length
+ JMP EXIT
+
+SKIP LDA #$FF ;Load 255
+ STA SKIPFLAG ;Set skip flag so we don't add to filename array
+
+EXIT RTS  ;Go back to Applesoft
+ LST OFF
+
+ SAV COPYCAT

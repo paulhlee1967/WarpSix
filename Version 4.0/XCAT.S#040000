@@ -4,7 +4,7 @@
 BEGIN = $8C00 ;we need up to $99FF
  ORG BEGIN-$300-$400-$900
 
-   ;XCAT needs $900 bytes
+ ;XCAT needs $900 bytes
 
 * Firmware Addresses
 
@@ -389,7 +389,7 @@ PRINTENTRY
  INC HOWMANY
  LDA #$FF
  STA FILES ;set flag to indicate we
-   ;printed some files.
+ ;printed some files.
 
 FULLSCR LDA HOWMANY
  CMP #31 ;30 files at a time
@@ -433,7 +433,7 @@ FULLSCR LDA HOWMANY
 
 :ABORT JSR COUT
  JSR CROUT
- SEC  ;abort
+ SEC ;abort
  RTS
 
 :NEXTKEY CMP #$8D
@@ -584,9 +584,9 @@ DODATE LDY #$22
  PLP ;restore carry status
  ROR ;put hi bit of month in b7
  LSR ;shift all bits down
- LSR 
- LSR 
- LSR 
+ LSR
+ LSR
+ LSR
  STA MONTH
 
  BEQ NODATE ;branch on illegal date
@@ -645,7 +645,13 @@ DOMONTH LDA MONTHS-3,X ;MOVE MONTH MNEUMONIC.
  LDA #"-"
  JSR COUT
 
- LDX YEAR
+ LDA YEAR
+ CMP #10 ;less than 10
+ BGE YEAR2
+ LDA #"0" ;print leading zero
+ JSR COUT
+
+YEAR2 LDX YEAR
  LDA #0
  JSR PRDEC ;convert to decimal
  CLC

@@ -240,7 +240,7 @@ COPY
  STA SAVESSGP+1
  LDX ARREND+1 get HI byte of address of
 *                                       array end
- INX  add 1 to form HI byte of
+ INX add 1 to form HI byte of
 *                              address of data buffer
  LDA STRST+1 get HI byte of address
 *                                   of string start
@@ -446,7 +446,7 @@ CMP1 LDA (PTR1),Y
 SOURCEXS LDA #$0A
  STA SSGINFO want to GET_FILE_INFO
  LDA #0
- STA FIMDATE    zero mod. date & time
+ STA FIMDATE zero mod. date & time
  STA FIMDATE+1
  STA FIMDATE+2
  STA FIMDATE+3

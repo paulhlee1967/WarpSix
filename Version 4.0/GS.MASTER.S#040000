@@ -1,5 +1,6 @@
  LST OFF
- LST FILE,GS.OUTPUT
+
+* LST FILE,GS.OUTPUT
 
 BEGIN = $8C00 ;we need up to $99FF
 

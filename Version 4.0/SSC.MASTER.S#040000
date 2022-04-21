@@ -6,11 +6,8 @@ BEGIN = $8C00 ;we need up to $99FF
 
 * Warp Six BBS SSC Master file
 
-* Instructions: 1) assemble this file as is.
-*
-* 2) change SSC to LOCAL and change NOIRQ=0 to =1
-*    and assemble again.
-*
+* Instructions:
+* Assemble this file as is.
 * You can change the pathname used to SAVe the object
 * code to whatever you desire.
 

@@ -126,9 +126,31 @@ GETLN BIT WWACTV Any data in wordwrap buf?
  STZ WWCHAR
  STZ WWACTV
  JSR CLRCUR
+
+* Remove Chat Request from Local Screen
+
+ STZ $24
+ LDA #3
+ STA $25
+ JSR $FB5B
+
+ LDY #$50
+ LDA #$DF
+
+:LOOP JSR C3COUT1
+ DEY
+ BNE :LOOP
+
+ LDA #23
+ STA $25
+ JSR $FB5B
+
+* End of mod
+
  JSR PRINT ;print off message
  HEX 8D8D
  ASC "Chat end : ",00
+
 :GOLN JMP GETLN
 :GONOCMD JMP :NOCMD
 
@@ -162,8 +184,9 @@ GETLN BIT WWACTV Any data in wordwrap buf?
  STA CHATFLG ;turn on chat flag
  JSR PRINT
  HEX 8D8D
- ASC "Chat :",8D8D8700
+ ASC "Chat :",8D8D00
  BRA :GOLN
+
 :HOTSAVE DS 1
 :ENTSAVE DS 1
 :VIDSAVE DS 1

@@ -28,8 +28,8 @@ RECV
  STZ SIZE+1
  LDA #$80
  STA SIZE ;Default 128 byte packets
-   ;is updated on receipt of
-   ;STX or SSTX.
+ ;is updated on receipt of
+ ;STX or SSTX.
 
  LDA #$FF ;always assume CRC
  STA CRCFLAG
@@ -82,10 +82,10 @@ RECV
 :XOPEN JSR OPEN ;open newly created file
  BEQ :READY ;if no error, we're ready
 
- PHA  ;save error code
+ PHA ;save error code
  JSR CLOSE ;close file
  JSR DESTROY ;delete it
- PLA  ;restore error code
+ PLA ;restore error code
 :ERROR1 JMP MLIERR
 
 * We're ready; file is open.
@@ -315,7 +315,7 @@ RCVDATA JSR GETBYTE ;1st get header
  BEQ :GOPRO
 
  JSR CLEAR ;unknown char received,
-  ;wait for line to clear
+ ;wait for line to clear
  BRA :TIMEOUT ;branch!
 
 :GOPRO JMP PRODOS2 ;ACK EOT and check ProDOS mode
@@ -569,7 +569,7 @@ PRODOS4 LDA #NAK
 
 :EOT CMP #EOT
  BEQ :ABORT ;abort if EOT received
-   ;if unknown, retry
+ ;if unknown, retry
 
 :TIMEOUT DEC TRYCOUNT
  INC ERRCOUNT
@@ -704,7 +704,7 @@ PRODOS6 LDA #ACK
  DFB $D0 ;set_eof!
  DA EOFPARMS-1 ;point to location in buffer
 
-   ;fall through to DONE
+ ;fall through to DONE
 
 DONE BIT BINARY2 ;in Binary 2 mode?
  BMI :NEWEOF
@@ -845,7 +845,7 @@ WRITEIT
  JSR CANCEL
  PLA
  TAX
- PLA  ;nested; do a POP.
+ PLA ;nested; do a POP.
  PLA
  TXA
  JMP MLIERR
@@ -884,7 +884,7 @@ WRITEBIN LDA #<FILEBUF+128 ;set pointer to data
  JSR RCVABORT
  PLA
  TAX
- PLA  ;nested; do a POP.
+ PLA ;nested; do a POP.
  PLA
  TXA
  JMP MLIERR
@@ -925,7 +925,7 @@ MAKEBIN LDA #<FILEBUF+23 ;point to file/pathname
  BNE :OKAY ;if not, create seedling.
 
  STA CAUXTYP+3 ;otherwise, create file
- BEQ :OKAY1  ;with given storage type.
+ BEQ :OKAY1 ;with given storage type.
 
 :OKAY LDA #$01
  STA CAUXTYP+3
@@ -956,7 +956,7 @@ MAKEBIN LDA #<FILEBUF+23 ;point to file/pathname
  LDA (PRTADR),Y ;get length
  STA OURPATH ;put in buffer
  INC OURPATH
- INY  ;point at 1st char of fname
+ INY ;point at 1st char of fname
 
 :COPY LDA (PRTADR),Y ;get a character
  STA OURPATH,Y ;put in buffer
@@ -972,10 +972,10 @@ MAKEBIN LDA #<FILEBUF+23 ;point to file/pathname
 :TOBASIC LDA OURPATH num chars in A
  LDY #$02 3rd byte of descriptor
  STA (VARTAB),Y store string length
- INY  increment for next byte
+ INY increment for next byte
  LDA #<LINBUF LSB of string start adr
  STA (VARTAB),Y
- INY  increment for next byte
+ INY increment for next byte
  LDA #>LINBUF MSB of string start adr
  STA (VARTAB),Y
 
@@ -1004,7 +1004,7 @@ MAKEBIN LDA #<FILEBUF+23 ;point to file/pathname
  JSR CANCEL
  PLA
  TAX
- PLA  ;nested; do a POP.
+ PLA ;nested; do a POP.
  PLA
  TXA
  JMP MLIERR
@@ -1074,7 +1074,7 @@ RCVABORT1 JSR CLOSE
 :EXIT LDA #1
  STA XERROR
  CLC
- RTS  ;and return.
+ RTS ;and return.
 
 PABORT JSR CANCEL
  JSR CLOSE

@@ -32,6 +32,6 @@ W6 = 1 ;always 1 for Warp Six
  PUT LOCAL.RTNS ;machine specific rtns
 
  PUT END ;make sure we didn't run
-   ;out of memory
+ ;out of memory
 
  SAV LOCAL.DRIVER
